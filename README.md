@@ -1,4 +1,5 @@
 # Генератор списка запущенных сервисов в Docker stack в JSON
+<!-- markdownlint-disable MD013 -->
 
 - [Генератор списка запущенных сервисов в Docker stack в JSON](#генератор-списка-запущенных-сервисов-в-docker-stack-в-json)
   - [Требования](#требования)
@@ -91,8 +92,16 @@ pip instarr -r req.txt
 
 ### docker
 
+Запуск со стандартной конфигурацией
+
 ```bash
 docker run -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock:ro registry/image:tag
+```
+
+Запуск со своей конфигурацией
+
+```bash
+docker run -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock:ro -v $PWD/config.ini:/app/config.ini registry/image:tag
 ```
 
 ### docker-compose
