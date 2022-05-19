@@ -15,7 +15,8 @@ if not exists("config.ini"):
         "loglevel": "INFO",
         "delta": 600,
         "blacklist": "",
-        "header": "docker_swarm"
+        "header": "docker_swarm",
+        "cachefile": "CachedResp.json"
     }
     loglevel = config["app"]["loglevel"]
     config["http"] = {"host": "0.0.0.0", "port": 8080}  # nosec
@@ -90,7 +91,7 @@ class ServicesLister:
                 result[config["app"]["header"]].append(tmpdct)
         logging.info("Docker api query finished")
         # Пишем ответ в виде JSON в файл
-        with open("CachedResp.json", "w") as cache_file:
+        with open(config["app"]["cachefile"], "w") as cache_file:
             cache_file.write(json.dumps(result, indent=2))
         return result
 
@@ -106,17 +107,17 @@ if __name__ == "__main__":
     @api.route('/', methods=['GET'])
     def get_list():
         # Если нет CachedResp.json
-        if not exists("CachedResp.json"):
-            list = json.dumps(lister.get_service_list())
+        if not exists(config["app"]["cachefile"]):
+            service_list = json.dumps(lister.get_service_list())
         # Если прошло больше чем app.delta времени
         elif (int(time.time()) - lister.last_query_time > int(
                 config["app"]["delta"])):
-            list = json.dumps(lister.get_service_list())
+            service_list = json.dumps(lister.get_service_list())
         # Ну или отдаём из кеша
         else:
-            with open("CachedResp.json", "r") as cache_file:
-                list = cache_file.read()
-        resp = Response(list)
+            with open(config["app"]["cachefile"], "r") as cache_file:
+                service_list = cache_file.read()
+        resp = Response(service_list)
         resp.headers["Content-Type"] = "application/json"
         return resp
 

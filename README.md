@@ -58,6 +58,7 @@ loglevel = INFO
 delta = 600
 blacklist = 
 header = docker_swarm
+cachefile = CachedResp.json
 
 [http]
 host = 0.0.0.0
@@ -70,6 +71,7 @@ port = 8080
 - `app.delta` - минимальное время между запросами к `/var/run/docker.sock` в секундах
 - `app.blacklist` - список названий сервисов, разделённых запятой, которые не надо включать в JSON. `service_app1,service_app2,service_app3`
 - `app.header` - имя корневого элемента JSON. `"app.header": [`
+- `app.cachefile` - путь до файла с кешем ответов от docker
 - `http.host` - IP, на котором слушает HTTP служба. Один из IP хоста или `0.0.0.0`
 - `http.port` - Порт, на котором слушает HTTP служба. Для использования портов <1024 нужны права пользователя `root` или привелегия `CAP_NET_ADMIN`
 
