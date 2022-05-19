@@ -1,0 +1,55 @@
+---
+kind: pipeline
+type: docker
+name: default
+image_pull_secrets:
+  - nexus_docker
+steps:
+  - name: Lint Docker
+    image: repo.ismv.ru/hadolint:latest
+    commands:
+      - lint
+  - name: Lint Yaml
+    image: repo.ismv.ru/yamllint:latest
+    commands:
+      - lint
+  - name: Lint Markdown
+    image: repo.ismv.ru/mdlint:latest
+    commands:
+      - lint
+  - name: Lint Python
+    image: repo.ismv.ru/pylint:latest
+    commands:
+      - lint aio
+  - name: Analyze with sonar
+    image: aosapps/drone-sonar-plugin
+    settings:
+      sonar_host: https://sonar.ismv.ru
+      sonar_token:
+        from_secret: sonar_token
+  - name: Build and push docker
+    image: plugins/docker
+    when:
+      event:
+        - tag
+    settings:
+      username:
+        from_secret: nexus_user
+      password:
+        from_secret: nexus_pass
+      repo: repo.ismv.ru/${DRONE_REPO_NAME}
+      registry: repo.ismv.ru
+      tags:
+        - latest
+        - ${DRONE_TAG}
+  - name: send tg message
+    image: appleboy/drone-telegram
+    settings:
+      token:
+        from_secret: tg_token
+      to:
+        from_secret: tg_to
+    when:
+      status:
+        - success
+        - failure
