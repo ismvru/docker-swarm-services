@@ -18,7 +18,7 @@ if not exists("config.ini"):
         "header": "docker_swarm"
     }
     loglevel = config["app"]["loglevel"]
-    config["http"] = {"host": "0.0.0.0", "port": 8080}
+    config["http"] = {"host": "0.0.0.0", "port": 8080}  # nosec
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
 logging.basicConfig(level=config["app"]["loglevel"])
