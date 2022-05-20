@@ -22,13 +22,21 @@
       "short_id": "ijv2qdz7jl",
       "name": "portainer-agent_agent",
       "image": "agent",
-      "tag": "2.10.0"
+      "tag": "2.10.0",
+      "created": "2022-03-06 20:31:00+03:00",
+      "created_human": "2 months ago",
+      "updated": "2022-05-01 18:00:31+03:00",
+      "updated_human": "2 weeks ago"
     },
     {
       "short_id": "p2d2qqf1pb",
       "name": "nginx-proxy-manager-external_nginx",
       "image": "nginx-proxy-manager",
-      "tag": "latest"
+      "tag": "latest",
+      "created": "2022-05-01 18:13:17+03:00",
+      "created_human": "2 weeks ago",
+      "updated": "2022-05-01 18:13:17+03:00",
+      "updated_human": "2 weeks ago"
     }
   ]
 }
@@ -40,6 +48,10 @@
 - `name` - имя службы
 - `image` - имя docker образа
 - `tag` - тег docker образа
+- `created` - Время создания сервиса
+- `created_human` - Время создания сервиса в виде строки "столько времени назад"
+- `updated` - Время обновления сервиса
+- `updated_human` - Время обновления сервиса в виде строки "столько времени назад"
 
 ## Требования
 
@@ -60,6 +72,7 @@ delta = 600
 blacklist = 
 header = docker_swarm
 cachefile = CachedResp.json
+timezone = Europe/Moscow
 
 [http]
 host = 0.0.0.0
@@ -73,6 +86,7 @@ port = 8080
 - `app.blacklist` - список названий сервисов, разделённых запятой, которые не надо включать в JSON. `service_app1,service_app2,service_app3`
 - `app.header` - имя корневого элемента JSON, а так же `cluster_name`. `"app.header": [`
 - `app.cachefile` - путь до файла с кешем ответов от docker
+- `app.timezone` - Временная зона для вывода created и updated. См. [список временных зон](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), List -> TZ database name
 - `http.host` - IP, на котором слушает HTTP служба. Один из IP хоста или `0.0.0.0`
 - `http.port` - Порт, на котором слушает HTTP служба. Для использования портов <1024 нужны права пользователя `root` или привелегия `CAP_NET_ADMIN`
 

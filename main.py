@@ -6,7 +6,7 @@ import logging
 import json
 import configparser
 import time
-
+import arrow
 # Основная конфигурация
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -16,7 +16,8 @@ if not exists("config.ini"):
         "delta": 600,
         "blacklist": "",
         "header": "docker_swarm",
-        "cachefile": "CachedResp.json"
+        "cachefile": "CachedResp.json",
+        "timezone": "Europe/Moscow"
     }
     loglevel = config["app"]["loglevel"]
     config["http"] = {"host": "0.0.0.0", "port": 8080}  # nosec
@@ -91,6 +92,15 @@ class ServicesLister:
                 tmpdct["image"] = image.split(":")[0]
                 # Тег Docker образа
                 tmpdct["tag"] = image.split(":")[-1]
+                # Created и Updated
+                tmpdct["created"] = self.timestr_humanize(
+                    service.attrs["CreatedAt"])[0]
+                tmpdct["created_human"] = self.timestr_humanize(
+                    service.attrs["CreatedAt"])[1]
+                tmpdct["updated"] = self.timestr_humanize(
+                    service.attrs["UpdatedAt"])[0]
+                tmpdct["updated_human"] = self.timestr_humanize(
+                    service.attrs["UpdatedAt"])[1]
                 # Добавляем временный словарь в массив в основном словаре
                 result[config["app"]["header"]].append(tmpdct)
         logging.info("Docker api query finished")
@@ -98,6 +108,12 @@ class ServicesLister:
         with open(config["app"]["cachefile"], "w") as cache_file:
             cache_file.write(json.dumps(result, indent=2))
         return result
+
+    def timestr_humanize(self, timestr: str) -> tuple:
+        timezone = config["app"]["timezone"]
+        utcdate = arrow.get(timestr)
+        localdate = utcdate.to(timezone)
+        return (localdate.format(), localdate.humanize())
 
 
 if __name__ == "__main__":
