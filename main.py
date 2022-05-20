@@ -50,6 +50,7 @@ class ServicesLister:
         """Получение списка служб и генерация ответа
         Возвращает словарь формата:
             {
+                "cluster_name": "docker_swarm",
                 "docker_swarm": [
                     {
                         "short_id": "ijv2qdz7jl",
@@ -70,7 +71,10 @@ class ServicesLister:
         logging.info("Docker api query started")
         # Единственный запрос к API Docker
         services = self.client.services.list()
-        result = {config["app"]["header"]: []}
+        result = {
+            "cluster_name": config["app"]["header"],
+            config["app"]["header"]: []
+        }
         for service in services:
             if service.name not in config["app"]["blacklist"].split(","):
                 # Создаём временный словарь для хранения результата
