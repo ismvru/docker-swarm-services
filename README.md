@@ -2,6 +2,9 @@
 <!-- markdownlint-disable MD013 -->
 
 - [Генератор списка запущенных сервисов в Docker stack в JSON](#генератор-списка-запущенных-сервисов-в-docker-stack-в-json)
+  - [Примеры работы](#примеры-работы)
+    - [Endpoint `/`](#endpoint-)
+    - [Endpoint `/table`](#endpoint-table)
   - [Требования](#требования)
   - [Конфигурация](#конфигурация)
   - [Сборка Docker образа](#сборка-docker-образа)
@@ -12,12 +15,16 @@
   
 Служба, которая подключается к `/var/run/docker.sock`, и отдаёт список запущенных сервисов в формате JSON
 
+## Примеры работы
+
+### Endpoint `/`
+
 Пример ответа:
 
 ```json
 {
   "cluster_name": "docker_swarm",
-  "docker_swarm": [
+  "data": [
     {
       "short_id": "ijv2qdz7jl",
       "name": "portainer-agent_agent",
@@ -53,6 +60,10 @@
 - `updated` - Время обновления сервиса
 - `updated_human` - Время обновления сервиса в виде строки "столько времени назад"
 
+### Endpoint `/table`
+
+![scr1.png](images/scr1.png)
+
 ## Требования
 
 - Python 3.8+
@@ -85,7 +96,7 @@ port = 8080
 - `app.loglevel` - уровень логирования службы. `DEBUG`/`INFO`/`WARNING`/`ERROR`
 - `app.delta` - минимальное время между запросами к `/var/run/docker.sock` в секундах
 - `app.blacklist` - список названий сервисов, разделённых запятой, которые не надо включать в JSON. `service_app1,service_app2,service_app3`
-- `app.header` - имя корневого элемента JSON, а так же `cluster_name`. `"app.header": [`
+- `app.header` - значение элемента JSON `cluster_name`
 - `app.cachefile` - путь до файла с кешем ответов от docker
 - `app.timezone` - Временная зона для вывода created и updated. См. [список временных зон](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), List -> TZ database name
 - `http.host` - IP, на котором слушает HTTP служба. Один из IP хоста или `0.0.0.0`

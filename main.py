@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, Response
+from flask import Flask, Response, render_template
 from os.path import exists
 import docker
 import logging
@@ -51,21 +51,29 @@ class ServicesLister:
         """Получение списка служб и генерация ответа
         Возвращает словарь формата:
             {
-                "cluster_name": "docker_swarm",
-                "docker_swarm": [
-                    {
-                        "short_id": "ijv2qdz7jl",
-                        "name": "portainer-agent_agent",
-                        "image": "agent",
-                        "tag": "2.10.0"
-                    },
-                    {
-                        "short_id": "p2d2qqf1pb",
-                        "name": "nginx-proxy-manager-external_nginx",
-                        "image": "nginx-proxy-manager",
-                        "tag": "latest"
-                    }
-                ]
+            "cluster_name": "docker_swarm",
+            "data": [
+                {
+                "short_id": "ijv2qdz7jl",
+                "name": "portainer-agent_agent",
+                "image": "agent",
+                "tag": "2.10.0",
+                "created": "2022-03-06 20:31:00+03:00",
+                "created_human": "2 months ago",
+                "updated": "2022-05-01 18:00:31+03:00",
+                "updated_human": "2 weeks ago"
+                },
+                {
+                "short_id": "p2d2qqf1pb",
+                "name": "nginx-proxy-manager-external_nginx",
+                "image": "nginx-proxy-manager",
+                "tag": "latest",
+                "created": "2022-05-01 18:13:17+03:00",
+                "created_human": "2 weeks ago",
+                "updated": "2022-05-01 18:13:17+03:00",
+                "updated_human": "2 weeks ago"
+                }
+            ]
             }
         Сохраняет JSON в временный файл CachedResp.json рядом с main.py
         """
@@ -74,7 +82,7 @@ class ServicesLister:
         services = self.client.services.list()
         result = {
             "cluster_name": config["app"]["header"],
-            config["app"]["header"]: []
+            "data": []
         }
         for service in services:
             if service.name not in config["app"]["blacklist"].split(","):
@@ -102,7 +110,7 @@ class ServicesLister:
                 tmpdct["updated_human"] = self.timestr_humanize(
                     service.attrs["UpdatedAt"])[1]
                 # Добавляем временный словарь в массив в основном словаре
-                result[config["app"]["header"]].append(tmpdct)
+                result["data"].append(tmpdct)
         logging.info("Docker api query finished")
         # Пишем ответ в виде JSON в файл
         with open(config["app"]["cachefile"], "w") as cache_file:
@@ -141,4 +149,7 @@ if __name__ == "__main__":
         resp.headers["Content-Type"] = "application/json"
         return resp
 
+    @api.route('/table', methods=['GET'])
+    def render_table():
+        return render_template("table.html")
     api.run(host=config["http"]["host"], port=config["http"]["port"])
