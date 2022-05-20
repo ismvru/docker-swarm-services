@@ -35,7 +35,9 @@
             "created_human": "2 months ago",
             "updated": "2022-05-01 18:00:31+03:00",
             "updated_human": "2 weeks ago",
-            "replica_count": 1
+            "tasks_count": 5,
+            "tasks_running": 1,
+            "tasks_shutdown": 4
         },
         {
             "short_id": "p2d2qqf1pb",
@@ -47,7 +49,9 @@
             "created_human": "2 weeks ago",
             "updated": "2022-05-01 18:13:17+03:00",
             "updated_human": "2 weeks ago",
-            "replica_count": 1
+            "tasks_count": 1,
+            "tasks_running": 1,
+            "tasks_shutdown": 0
         }
     ]
 }
@@ -64,7 +68,9 @@
 - `created_human` - Время создания сервиса в виде строки "столько времени назад"
 - `updated` - Время обновления сервиса
 - `updated_human` - Время обновления сервиса в виде строки "столько времени назад"
-- `replica_count` - Количество запущенный экземпляров сервиса на данный момент
+- `tasks_count` - Общее количество заданий в сервисе
+- `tasks_running` - Количество заданий в сервисе в состоянии `running`
+- `tasks_shutdown` - Количество заданий в сервисе в состоянии `shutdown`
 
 ### Endpoint `/table`
 

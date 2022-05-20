@@ -64,7 +64,9 @@ class ServicesLister:
                         "created_human": "2 months ago",
                         "updated": "2022-05-01 18:00:31+03:00",
                         "updated_human": "2 weeks ago",
-                        "replica_count": 1
+                        "tasks_count": 5,
+                        "tasks_running": 1,
+                        "tasks_shutdown": 4
                     },
                     {
                         "short_id": "p2d2qqf1pb",
@@ -76,7 +78,9 @@ class ServicesLister:
                         "created_human": "2 weeks ago",
                         "updated": "2022-05-01 18:13:17+03:00",
                         "updated_human": "2 weeks ago",
-                        "replica_count": 1
+                        "tasks_count": 1,
+                        "tasks_running": 1,
+                        "tasks_shutdown": 0
                     }
                 ]
             }
@@ -117,7 +121,16 @@ class ServicesLister:
                 service.attrs["UpdatedAt"])[0]
             tmpdct["updated_human"] = self.timestr_humanize(
                 service.attrs["UpdatedAt"])[1]
-            tmpdct["replica_count"] = len(service.tasks())
+            tasks_running = 0
+            tasks_shutdown = 0
+            for task in service.tasks():
+                if task["DesiredState"] == "running":
+                    tasks_running += 1
+                elif task["DesiredState"] == "shutdown":
+                    tasks_shutdown += 1
+            tmpdct["tasks_count"] = len(service.tasks())
+            tmpdct["tasks_running"] = tasks_running
+            tmpdct["tasks_shutdown"] = tasks_shutdown
             # Добавляем временный словарь в массив в основном словаре
             result["data"].append(tmpdct)
         logging.info("Docker api query finished")

@@ -1,17 +1,23 @@
-$(document).ready(function () {
-    $('#table_id').DataTable({
-        ajax: '/',
-        columns: [
-            { data: 'short_id' },
-            { data: 'name' },
-            { data: 'stack' },
-            { data: 'image' },
-            { data: 'tag' },
-            { data: 'replica_count' },
-            { data: 'created' },
-            { data: 'created_human' },
-            { data: 'updated' },
-            { data: 'updated_human' }
-        ],
-    });
-});
+$(document).ready(
+    function () {
+        $('#table_id').DataTable(
+            {
+                ajax: '/',
+                columns: [
+                    { data: 'short_id' },
+                    { data: 'name' },
+                    { data: 'stack' },
+                    { data: 'image' },
+                    { data: 'tag' },
+                    { data: 'tasks_count' },
+                    { data: 'tasks_running' },
+                    { data: 'tasks_shutdown' },
+                    { data: 'created' },
+                    { data: 'created_human' },
+                    { data: 'updated' },
+                    { data: 'updated_human' }
+                ],
+            }
+        );
+    }
+);
