@@ -4,6 +4,7 @@ $(document).ready(function () {
         columns: [
             { data: 'short_id' },
             { data: 'name' },
+            { data: 'stack' },
             { data: 'image' },
             { data: 'tag' },
             { data: 'created' },

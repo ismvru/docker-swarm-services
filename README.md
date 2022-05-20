@@ -23,29 +23,31 @@
 
 ```json
 {
-  "cluster_name": "docker_swarm",
-  "data": [
-    {
-      "short_id": "ijv2qdz7jl",
-      "name": "portainer-agent_agent",
-      "image": "agent",
-      "tag": "2.10.0",
-      "created": "2022-03-06 20:31:00+03:00",
-      "created_human": "2 months ago",
-      "updated": "2022-05-01 18:00:31+03:00",
-      "updated_human": "2 weeks ago"
-    },
-    {
-      "short_id": "p2d2qqf1pb",
-      "name": "nginx-proxy-manager-external_nginx",
-      "image": "nginx-proxy-manager",
-      "tag": "latest",
-      "created": "2022-05-01 18:13:17+03:00",
-      "created_human": "2 weeks ago",
-      "updated": "2022-05-01 18:13:17+03:00",
-      "updated_human": "2 weeks ago"
-    }
-  ]
+    "cluster_name": "docker_swarm",
+    "data": [
+        {
+            "short_id": "ijv2qdz7jl",
+            "name": "portainer-agent_agent",
+            "stack": "portainer-agent",
+            "image": "agent",
+            "tag": "2.10.0",
+            "created": "2022-03-06 20:31:00+03:00",
+            "created_human": "2 months ago",
+            "updated": "2022-05-01 18:00:31+03:00",
+            "updated_human": "2 weeks ago"
+        },
+        {
+            "short_id": "p2d2qqf1pb",
+            "name": "nginx-proxy-manager-external_nginx",
+            "stack": "nginx-proxy-manager-external",
+            "image": "nginx-proxy-manager",
+            "tag": "latest",
+            "created": "2022-05-01 18:13:17+03:00",
+            "created_human": "2 weeks ago",
+            "updated": "2022-05-01 18:13:17+03:00",
+            "updated_human": "2 weeks ago"
+        }
+    ]
 }
 ```
 
@@ -53,6 +55,7 @@
 
 - `short_id` - ID службы
 - `name` - имя службы
+- `stack` - имя стека
 - `image` - имя docker образа
 - `tag` - тег docker образа
 - `created` - Время создания сервиса

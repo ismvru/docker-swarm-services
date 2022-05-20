@@ -51,29 +51,31 @@ class ServicesLister:
         """Получение списка служб и генерация ответа
         Возвращает словарь формата:
             {
-            "cluster_name": "docker_swarm",
-            "data": [
-                {
-                "short_id": "ijv2qdz7jl",
-                "name": "portainer-agent_agent",
-                "image": "agent",
-                "tag": "2.10.0",
-                "created": "2022-03-06 20:31:00+03:00",
-                "created_human": "2 months ago",
-                "updated": "2022-05-01 18:00:31+03:00",
-                "updated_human": "2 weeks ago"
-                },
-                {
-                "short_id": "p2d2qqf1pb",
-                "name": "nginx-proxy-manager-external_nginx",
-                "image": "nginx-proxy-manager",
-                "tag": "latest",
-                "created": "2022-05-01 18:13:17+03:00",
-                "created_human": "2 weeks ago",
-                "updated": "2022-05-01 18:13:17+03:00",
-                "updated_human": "2 weeks ago"
-                }
-            ]
+                "cluster_name": "docker_swarm",
+                "data": [
+                    {
+                        "short_id": "ijv2qdz7jl",
+                        "name": "portainer-agent_agent",
+                        "stack": "portainer-agent",
+                        "image": "agent",
+                        "tag": "2.10.0",
+                        "created": "2022-03-06 20:31:00+03:00",
+                        "created_human": "2 months ago",
+                        "updated": "2022-05-01 18:00:31+03:00",
+                        "updated_human": "2 weeks ago"
+                    },
+                    {
+                        "short_id": "p2d2qqf1pb",
+                        "name": "nginx-proxy-manager-external_nginx",
+                        "stack": "nginx-proxy-manager-external",
+                        "image": "nginx-proxy-manager",
+                        "tag": "latest",
+                        "created": "2022-05-01 18:13:17+03:00",
+                        "created_human": "2 weeks ago",
+                        "updated": "2022-05-01 18:13:17+03:00",
+                        "updated_human": "2 weeks ago"
+                    }
+                ]
             }
         Сохраняет JSON в временный файл CachedResp.json рядом с main.py
         """
@@ -92,6 +94,8 @@ class ServicesLister:
                 tmpdct["short_id"] = service.short_id
                 # Добавляем имя сервиса
                 tmpdct["name"] = service.name
+                # Добавляем имя стека
+                tmpdct["stack"] = service.name.rsplit('_', 1)[0]
                 # Вытаскиваем все метки
                 labels = service.attrs["Spec"]["Labels"]
                 # Имя Docker образа без registry
