@@ -34,7 +34,8 @@
             "created": "2022-03-06 20:31:00+03:00",
             "created_human": "2 months ago",
             "updated": "2022-05-01 18:00:31+03:00",
-            "updated_human": "2 weeks ago"
+            "updated_human": "2 weeks ago",
+            "replica_count": 1
         },
         {
             "short_id": "p2d2qqf1pb",
@@ -45,7 +46,8 @@
             "created": "2022-05-01 18:13:17+03:00",
             "created_human": "2 weeks ago",
             "updated": "2022-05-01 18:13:17+03:00",
-            "updated_human": "2 weeks ago"
+            "updated_human": "2 weeks ago",
+            "replica_count": 1
         }
     ]
 }
@@ -62,6 +64,7 @@
 - `created_human` - Время создания сервиса в виде строки "столько времени назад"
 - `updated` - Время обновления сервиса
 - `updated_human` - Время обновления сервиса в виде строки "столько времени назад"
+- `replica_count` - Количество запущенный экземпляров сервиса на данный момент
 
 ### Endpoint `/table`
 
@@ -102,6 +105,7 @@ port = 8080
 - `app.header` - значение элемента JSON `cluster_name`
 - `app.cachefile` - путь до файла с кешем ответов от docker
 - `app.timezone` - Временная зона для вывода created и updated. См. [список временных зон](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), List -> TZ database name
+- `app.without_tasks` - Показывать ли сервисы без запущенных экземпляров
 - `http.host` - IP, на котором слушает HTTP служба. Один из IP хоста или `0.0.0.0`
 - `http.port` - Порт, на котором слушает HTTP служба. Для использования портов <1024 нужны права пользователя `root` или привелегия `CAP_NET_ADMIN`
 

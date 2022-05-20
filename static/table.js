@@ -7,6 +7,7 @@ $(document).ready(function () {
             { data: 'stack' },
             { data: 'image' },
             { data: 'tag' },
+            { data: 'replica_count' },
             { data: 'created' },
             { data: 'created_human' },
             { data: 'updated' },

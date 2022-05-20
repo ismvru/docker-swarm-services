@@ -17,7 +17,8 @@ if not exists("config.ini"):
         "blacklist": "",
         "header": "docker_swarm",
         "cachefile": "CachedResp.json",
-        "timezone": "Europe/Moscow"
+        "timezone": "Europe/Moscow",
+        "without_tasks": "no"
     }
     loglevel = config["app"]["loglevel"]
     config["http"] = {"host": "0.0.0.0", "port": 8080}  # nosec
@@ -62,7 +63,8 @@ class ServicesLister:
                         "created": "2022-03-06 20:31:00+03:00",
                         "created_human": "2 months ago",
                         "updated": "2022-05-01 18:00:31+03:00",
-                        "updated_human": "2 weeks ago"
+                        "updated_human": "2 weeks ago",
+                        "replica_count": 1
                     },
                     {
                         "short_id": "p2d2qqf1pb",
@@ -73,7 +75,8 @@ class ServicesLister:
                         "created": "2022-05-01 18:13:17+03:00",
                         "created_human": "2 weeks ago",
                         "updated": "2022-05-01 18:13:17+03:00",
-                        "updated_human": "2 weeks ago"
+                        "updated_human": "2 weeks ago",
+                        "replica_count": 1
                     }
                 ]
             }
@@ -82,39 +85,41 @@ class ServicesLister:
         logging.info("Docker api query started")
         # Единственный запрос к API Docker
         services = self.client.services.list()
-        result = {
-            "cluster_name": config["app"]["header"],
-            "data": []
-        }
+        result = {"cluster_name": config["app"]["header"], "data": []}
         for service in services:
-            if service.name not in config["app"]["blacklist"].split(","):
-                # Создаём временный словарь для хранения результата
-                tmpdct = {}
-                # Добавляем в него короткий ID сервиса
-                tmpdct["short_id"] = service.short_id
-                # Добавляем имя сервиса
-                tmpdct["name"] = service.name
-                # Добавляем имя стека
-                tmpdct["stack"] = service.name.rsplit('_', 1)[0]
-                # Вытаскиваем все метки
-                labels = service.attrs["Spec"]["Labels"]
-                # Имя Docker образа без registry
-                image = labels["com.docker.stack.image"].split("/")[-1]
-                # Сам Docker образ без тега
-                tmpdct["image"] = image.split(":")[0]
-                # Тег Docker образа
-                tmpdct["tag"] = image.split(":")[-1]
-                # Created и Updated
-                tmpdct["created"] = self.timestr_humanize(
-                    service.attrs["CreatedAt"])[0]
-                tmpdct["created_human"] = self.timestr_humanize(
-                    service.attrs["CreatedAt"])[1]
-                tmpdct["updated"] = self.timestr_humanize(
-                    service.attrs["UpdatedAt"])[0]
-                tmpdct["updated_human"] = self.timestr_humanize(
-                    service.attrs["UpdatedAt"])[1]
-                # Добавляем временный словарь в массив в основном словаре
-                result["data"].append(tmpdct)
+            if len(service.tasks()) == 0 and not config.getboolean(
+                    "app", "without_tasks"):
+                continue
+            if service.name in config["app"]["blacklist"].split(","):
+                continue
+            # Создаём временный словарь для хранения результата
+            tmpdct = {}
+            # Добавляем в него короткий ID сервиса
+            tmpdct["short_id"] = service.short_id
+            # Добавляем имя сервиса
+            tmpdct["name"] = service.name
+            # Добавляем имя стека
+            tmpdct["stack"] = service.name.rsplit('_', 1)[0]
+            # Вытаскиваем все метки
+            labels = service.attrs["Spec"]["Labels"]
+            # Имя Docker образа без registry
+            image = labels["com.docker.stack.image"].split("/")[-1]
+            # Сам Docker образ без тега
+            tmpdct["image"] = image.split(":")[0]
+            # Тег Docker образа
+            tmpdct["tag"] = image.split(":")[-1]
+            # Created и Updated
+            tmpdct["created"] = self.timestr_humanize(
+                service.attrs["CreatedAt"])[0]
+            tmpdct["created_human"] = self.timestr_humanize(
+                service.attrs["CreatedAt"])[1]
+            tmpdct["updated"] = self.timestr_humanize(
+                service.attrs["UpdatedAt"])[0]
+            tmpdct["updated_human"] = self.timestr_humanize(
+                service.attrs["UpdatedAt"])[1]
+            tmpdct["replica_count"] = len(service.tasks())
+            # Добавляем временный словарь в массив в основном словаре
+            result["data"].append(tmpdct)
         logging.info("Docker api query finished")
         # Пишем ответ в виде JSON в файл
         with open(config["app"]["cachefile"], "w") as cache_file:
@@ -156,4 +161,5 @@ if __name__ == "__main__":
     @api.route('/table', methods=['GET'])
     def render_table():
         return render_template("table.html")
+
     api.run(host=config["http"]["host"], port=config["http"]["port"])
