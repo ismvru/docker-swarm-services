@@ -58,6 +58,7 @@
 - Python 3.8+
 - python-flask
 - python-docker
+- python-arrow
 - Кластер docker swarm
 - Доступ на чтение к /var/run/docker.sock
 
