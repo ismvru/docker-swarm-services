@@ -2,7 +2,7 @@ $(document).ready(
     function () {
         $('#table_id').DataTable(
             {
-                ajax: '/',
+                ajax: '/ajax',
                 columns: [
                     { data: 'short_id' },
                     { data: 'name' },

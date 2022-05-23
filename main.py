@@ -48,42 +48,8 @@ class ServicesLister:
         self.last_query_time = 0
         logging.debug(f"{self.swarm_version = }")
 
-    def get_service_list(self) -> dict:
+    def get_service_list(self, ajax=False) -> dict:
         """Получение списка служб и генерация ответа
-        Возвращает словарь формата:
-            {
-                "cluster_name": "docker_swarm",
-                "data": [
-                    {
-                        "short_id": "ijv2qdz7jl",
-                        "name": "portainer-agent_agent",
-                        "stack": "portainer-agent",
-                        "image": "agent",
-                        "tag": "2.10.0",
-                        "created": "2022-03-06 20:31:00+03:00",
-                        "created_human": "2 months ago",
-                        "updated": "2022-05-01 18:00:31+03:00",
-                        "updated_human": "2 weeks ago",
-                        "tasks_count": 5,
-                        "tasks_running": 1,
-                        "tasks_shutdown": 4
-                    },
-                    {
-                        "short_id": "p2d2qqf1pb",
-                        "name": "nginx-proxy-manager-external_nginx",
-                        "stack": "nginx-proxy-manager-external",
-                        "image": "nginx-proxy-manager",
-                        "tag": "latest",
-                        "created": "2022-05-01 18:13:17+03:00",
-                        "created_human": "2 weeks ago",
-                        "updated": "2022-05-01 18:13:17+03:00",
-                        "updated_human": "2 weeks ago",
-                        "tasks_count": 1,
-                        "tasks_running": 1,
-                        "tasks_shutdown": 0
-                    }
-                ]
-            }
         Сохраняет JSON в временный файл CachedResp.json рядом с main.py
         """
         logging.info("Docker api query started")
@@ -131,13 +97,17 @@ class ServicesLister:
             tmpdct["tasks_count"] = len(service.tasks())
             tmpdct["tasks_running"] = tasks_running
             tmpdct["tasks_shutdown"] = tasks_shutdown
+            tmpdct["cluster_name"] = config["app"]["header"]
             # Добавляем временный словарь в массив в основном словаре
             result["data"].append(tmpdct)
         logging.info("Docker api query finished")
         # Пишем ответ в виде JSON в файл
         with open(config["app"]["cachefile"], "w") as cache_file:
             cache_file.write(json.dumps(result, indent=2))
-        return result
+        if ajax:
+            return result
+        else:
+            return [result]
 
     def timestr_humanize(self, timestr: str) -> tuple:
         timezone = config["app"]["timezone"]
@@ -163,6 +133,23 @@ if __name__ == "__main__":
         elif (int(time.time()) - lister.last_query_time > int(
                 config["app"]["delta"])):
             service_list = json.dumps(lister.get_service_list())
+        # Ну или отдаём из кеша
+        else:
+            with open(config["app"]["cachefile"], "r") as cache_file:
+                service_list = cache_file.read()
+        resp = Response(service_list)
+        resp.headers["Content-Type"] = "application/json"
+        return resp
+
+    @api.route('/ajax', methods=['GET'])
+    def get_list_for_ajax():
+        # Если нет CachedResp.json
+        if not exists(config["app"]["cachefile"]):
+            service_list = json.dumps(lister.get_service_list(ajax=True))
+        # Если прошло больше чем app.delta времени
+        elif (int(time.time()) - lister.last_query_time > int(
+                config["app"]["delta"])):
+            service_list = json.dumps(lister.get_service_list(ajax=True))
         # Ну или отдаём из кеша
         else:
             with open(config["app"]["cachefile"], "r") as cache_file:
