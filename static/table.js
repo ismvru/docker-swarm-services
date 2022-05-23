@@ -2,9 +2,39 @@ $(document).ready(
     function () {
         $('#table_id').DataTable(
             {
+                paging: false,
+                order: [[1, 'asc']],
                 dom: 'Bfrtip',
                 buttons: [
-                    'copyHtml5', 'csvHtml5', 'excelHtml5', 'pdfHtml5',
+                    {
+                        extend: 'copyHtml5',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        autoFilter: true,
+                        sheetName: 'Exported data',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        download: 'open',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
                     {
                         extend: 'print',
                         exportOptions: {
