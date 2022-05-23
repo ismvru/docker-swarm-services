@@ -30,7 +30,6 @@ $(document).ready(
                         extend: 'pdfHtml5',
                         orientation: 'landscape',
                         pageSize: 'A4',
-                        download: 'open',
                         exportOptions: {
                             columns: ':visible'
                         }

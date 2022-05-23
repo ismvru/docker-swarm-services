@@ -8,6 +8,7 @@ import time
 from serviceslister import ServicesLister
 from dict2xml import dict2xml
 import yaml
+from dataclasses import dataclass
 
 # Основная конфигурация
 config = configparser.ConfigParser()
@@ -28,6 +29,14 @@ if not exists("config.ini"):
         config.write(configfile)
 logging.basicConfig(level=config["app"]["loglevel"])
 
+
+@dataclass
+class mime:
+    json: str = "application/json"
+    xml: str = "text/xml"
+    yaml: str = "text/yaml"
+
+
 if __name__ == "__main__":
     header = config["app"]["header"]
     without_tasks = config.getboolean("app", "without_tasks")
@@ -47,9 +56,8 @@ if __name__ == "__main__":
         # Если нет CachedResp.json
         response_type = request.args.get('format')
         if response_type not in ["xml", "json", "yaml", "yml", None]:
-            abort(
-                400,
-                f'format must be json/xml/yaml/yml, not {response_type}')
+            abort(400,
+                  f'format must be json/xml/yaml/yml, not {response_type}')
         if not exists(cachefile):
             service_list = lister.get_service_list(header=header,
                                                    without_tasks=without_tasks,
@@ -57,14 +65,11 @@ if __name__ == "__main__":
                                                    cachefile=cachefile,
                                                    timezone=timezone)
             if response_type in [None, "json"]:
-                resp = Response(json.dumps(service_list))
-                resp.headers["Content-Type"] = "application/json"
+                resp = Response(json.dumps(service_list), mimetype=mime.json)
             elif response_type == "xml":
-                resp = Response(dict2xml(service_list))
-                resp.headers["Content-Type"] = "application/xml"
+                resp = Response(dict2xml(service_list), mimetype=mime.xml)
             elif response_type in ["yml", "yaml"]:
-                resp = Response(yaml.dump(service_list))
-                resp.headers["Content-Type"] = "application/yaml"
+                resp = Response(yaml.dump(service_list), mimetype=mime.yaml)
 
         # Если прошло больше чем app.delta времени
         elif (int(time.time()) - lister.last_query_time > int(
@@ -75,28 +80,22 @@ if __name__ == "__main__":
                                                    cachefile=cachefile,
                                                    timezone=timezone)
             if response_type in [None, "json"]:
-                resp = Response(json.dumps(service_list))
-                resp.headers["Content-Type"] = "application/json"
+                resp = Response(json.dumps(service_list), mimetype=mime.json)
             elif response_type == "xml":
-                resp = Response(dict2xml(service_list))
-                resp.headers["Content-Type"] = "application/xml"
+                resp = Response(dict2xml(service_list), mimetype=mime.xml)
             elif response_type in ["yml", "yaml"]:
-                resp = Response(yaml.dump(service_list))
-                resp.headers["Content-Type"] = "application/yaml"
+                resp = Response(yaml.dump(service_list), mimetype=mime.yaml)
 
         # Ну или отдаём из кеша
         else:
             with open(cachefile, "r") as cache_file:
                 service_list = json.loads(cache_file.read())
             if response_type in [None, "json"]:
-                resp = Response(json.dumps(service_list))
-                resp.headers["Content-Type"] = "application/json"
+                resp = Response(json.dumps(service_list), mimetype=mime.json)
             elif response_type == "xml":
-                resp = Response(dict2xml(service_list))
-                resp.headers["Content-Type"] = "application/xml"
+                resp = Response(dict2xml(service_list), mimetype=mime.xml)
             elif response_type in ["yml", "yaml"]:
-                resp = Response(yaml.dump(service_list))
-                resp.headers["Content-Type"] = "application/yaml"
+                resp = Response(yaml.dump(service_list), mimetype=mime.yaml)
         return resp
 
     @api.route('/ajax', methods=['GET'])
@@ -124,8 +123,7 @@ if __name__ == "__main__":
         else:
             with open(cachefile, "r") as cache_file:
                 service_list = cache_file.read()
-        resp = Response(service_list)
-        resp.headers["Content-Type"] = "application/json"
+        resp = Response(service_list, mimetype=mime.json)
         return resp
 
     @api.route('/table', methods=['GET'])
