@@ -75,19 +75,19 @@ class ServicesLister:
             tmpdct["replication_mode"] = list(
                 service.attrs["Spec"]["Mode"].keys())[0]
             if tmpdct["replication_mode"] == "Replicated":
-                tmpdct["replica_count"] = service.attrs["Spec"]["Mode"][
+                tmpdct["replica_want"] = service.attrs["Spec"]["Mode"][
                     "Replicated"]["Replicas"]
             else:
-                tmpdct["replica_count"] = len(self.client.nodes.list())
-            tasks_running = 0
+                tmpdct["replica_want"] = len(self.client.nodes.list())
+            replica_running = 0
             tasks_shutdown = 0
             for task in service.tasks():
                 if task["DesiredState"] == "running":
-                    tasks_running += 1
+                    replica_running += 1
                 elif task["DesiredState"] == "shutdown":
                     tasks_shutdown += 1
             tmpdct["tasks_count"] = len(service.tasks())
-            tmpdct["tasks_running"] = tasks_running
+            tmpdct["replica_running"] = replica_running
             tmpdct["tasks_shutdown"] = tasks_shutdown
             tmpdct["cluster_name"] = header
             # Добавляем временный словарь в массив в основном словаре

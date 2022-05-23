@@ -44,9 +44,9 @@
         "updated": "2022-05-01 18:00:31+03:00",
         "updated_human": "3 weeks ago",
         "replication_mode": "Global",
-        "replica_count": 1,
+        "replica_want": 1,
         "tasks_count": 5,
-        "tasks_running": 1,
+        "replica_running": 1,
         "tasks_shutdown": 4,
         "cluster_name": "docker_swarm"
       },
@@ -61,9 +61,9 @@
         "updated": "2022-05-21 02:17:09+03:00",
         "updated_human": "2 days ago",
         "replication_mode": "Replicated",
-        "replica_count": 1,
+        "replica_want": 1,
         "tasks_count": 2,
-        "tasks_running": 1,
+        "replica_running": 1,
         "tasks_shutdown": 1,
         "cluster_name": "docker_swarm"
       }
@@ -80,13 +80,13 @@
     <created_human>2 months ago</created_human>
     <image>agent</image>
     <name>portainer-agent_agent</name>
-    <replica_count>1</replica_count>
+    <replica_want>1</replica_want>
     <replication_mode>Global</replication_mode>
     <short_id>ijv2qdz7jl</short_id>
     <stack>portainer-agent</stack>
     <tag>2.10.0</tag>
     <tasks_count>5</tasks_count>
-    <tasks_running>1</tasks_running>
+    <replica_running>1</replica_running>
     <tasks_shutdown>4</tasks_shutdown>
     <updated>2022-05-01 18:00:31+03:00</updated>
     <updated_human>3 weeks ago</updated_human>
@@ -97,13 +97,13 @@
     <created_human>3 weeks ago</created_human>
     <image>nginx-proxy-manager</image>
     <name>nginx-proxy-manager-external_nginx</name>
-    <replica_count>1</replica_count>
+    <replica_want>1</replica_want>
     <replication_mode>Replicated</replication_mode>
     <short_id>p2d2qqf1pb</short_id>
     <stack>nginx-proxy-manager-external</stack>
     <tag>latest</tag>
     <tasks_count>2</tasks_count>
-    <tasks_running>1</tasks_running>
+    <replica_running>1</replica_running>
     <tasks_shutdown>1</tasks_shutdown>
     <updated>2022-05-21 02:17:09+03:00</updated>
     <updated_human>2 days ago</updated_human>
@@ -118,13 +118,13 @@
     created_human: 2 months ago
     image: agent
     name: portainer-agent_agent
-    replica_count: 1
+    replica_want: 1
     replication_mode: Global
     short_id: ijv2qdz7jl
     stack: portainer-agent
     tag: 2.10.0
     tasks_count: 5
-    tasks_running: 1
+    replica_running: 1
     tasks_shutdown: 4
     updated: '2022-05-01 18:00:31+03:00'
     updated_human: 3 weeks ago
@@ -133,13 +133,13 @@
     created_human: 3 weeks ago
     image: nginx-proxy-manager
     name: nginx-proxy-manager-external_nginx
-    replica_count: 1
+    replica_want: 1
     replication_mode: Replicated
     short_id: p2d2qqf1pb
     stack: nginx-proxy-manager-external
     tag: latest
     tasks_count: 2
-    tasks_running: 1
+    replica_running: 1
     tasks_shutdown: 1
     updated: '2022-05-21 02:17:09+03:00'
     updated_human: 2 days ago
@@ -157,7 +157,7 @@
 - `updated` - Время обновления сервиса
 - `updated_human` - Время обновления сервиса в виде строки "столько времени назад"
 - `tasks_count` - Общее количество заданий в сервисе
-- `tasks_running` - Количество заданий в сервисе в состоянии `running`
+- `replica_running` - Количество заданий в сервисе в состоянии `running`
 - `tasks_shutdown` - Количество заданий в сервисе в состоянии `shutdown`
 - `cluster_name` - см. [Конфигурация](#конфигурация)
 
@@ -182,7 +182,7 @@
             "updated": "2022-05-01 18:00:31+03:00",
             "updated_human": "2 weeks ago",
             "tasks_count": 5,
-            "tasks_running": 1,
+            "replica_running": 1,
             "tasks_shutdown": 4,
             "cluster_name": "docker_swarm"
         },
@@ -197,7 +197,7 @@
             "updated": "2022-05-01 18:13:17+03:00",
             "updated_human": "2 weeks ago",
             "tasks_count": 1,
-            "tasks_running": 1,
+            "replica_running": 1,
             "tasks_shutdown": 0,
             "cluster_name": "docker_swarm"
         }
@@ -217,7 +217,7 @@
 - `updated` - Время обновления сервиса
 - `updated_human` - Время обновления сервиса в виде строки "столько времени назад"
 - `tasks_count` - Общее количество заданий в сервисе
-- `tasks_running` - Количество заданий в сервисе в состоянии `running`
+- `replica_running` - Количество заданий в сервисе в состоянии `running`
 - `tasks_shutdown` - Количество заданий в сервисе в состоянии `shutdown`
 - `cluster_name` - см. [Конфигурация](#конфигурация)
 
