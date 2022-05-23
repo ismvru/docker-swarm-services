@@ -96,7 +96,7 @@ if __name__ == "__main__":
     @api.route('/ajax', methods=['GET'])
     def get_list_for_ajax():
         # Если нет CachedResp.json
-        if lister.last_response is None:
+        if lister.last_response_ajax is None:
             service_list = json.dumps(
                 lister.get_service_list(header=header,
                                         without_tasks=without_tasks,
@@ -114,7 +114,7 @@ if __name__ == "__main__":
                                         ajax=True))
         # Ну или отдаём из кеша
         else:
-            service_list = json.dumps(lister.last_response)
+            service_list = json.dumps(lister.last_response_ajax)
         resp = Response(service_list, mimetype=mime.json)
         return resp
 
