@@ -2,8 +2,8 @@
 import docker
 import logging
 from typing import Any
-import json
 import arrow
+import time
 
 
 class ServicesLister:
@@ -25,19 +25,21 @@ class ServicesLister:
             logging.exception(e)
             exit(1)
         self.last_query_time = 0
+        self.last_response: list = None
+        self.last_response_ajax: dict = None
         logging.debug(f"{self.swarm_version = }")
 
     def get_service_list(self,
                          header: str = "docker_swarm",
                          without_tasks: bool = False,
                          blacklist: str = "",
-                         cachefile: str = "CachedResp.json",
                          timezone: str = "GMT",
                          ajax=False) -> Any:
         """Получение списка служб и генерация ответа
         Сохраняет JSON в временный файл CachedResp.json рядом с main.py
         """
         logging.info("Docker api query started")
+        self.last_query_time = time.time()
         # Единственный запрос к API Docker
         services = self.client.services.list()
         result = {"cluster_name": header, "data": []}
@@ -93,12 +95,11 @@ class ServicesLister:
             # Добавляем временный словарь в массив в основном словаре
             result["data"].append(tmpdct)
         logging.info("Docker api query finished")
-        # Пишем ответ в виде JSON в файл
-        with open(cachefile, "w") as cache_file:
-            cache_file.write(json.dumps(result, indent=2))
         if ajax:
+            self.last_response_ajax = result
             return result
         else:
+            self.last_response = [result]
             return [result]
 
     def timestr_humanize(self, timestr: str, timezone="GMT") -> tuple:

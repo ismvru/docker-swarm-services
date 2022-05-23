@@ -19,7 +19,6 @@ if not exists("config.ini"):
         "delta": 600,
         "blacklist": "",
         "header": "docker_swarm",
-        "cachefile": "CachedResp.json",
         "timezone": "Europe/Moscow",
         "without_tasks": "no"
     }
@@ -41,7 +40,6 @@ if __name__ == "__main__":
     header = config["app"]["header"]
     without_tasks = config.getboolean("app", "without_tasks")
     blacklist = config["app"]["blacklist"]
-    cachefile = config["app"]["cachefile"]
     timezone = config["app"]["timezone"]
 
     # Инициализируем класс
@@ -58,11 +56,10 @@ if __name__ == "__main__":
         if response_type not in ["xml", "json", "yaml", "yml", None]:
             abort(400,
                   f'format must be json/xml/yaml/yml, not {response_type}')
-        if not exists(cachefile):
+        if lister.last_response is None:
             service_list = lister.get_service_list(header=header,
                                                    without_tasks=without_tasks,
                                                    blacklist=blacklist,
-                                                   cachefile=cachefile,
                                                    timezone=timezone)
             if response_type in [None, "json"]:
                 resp = Response(json.dumps(service_list), mimetype=mime.json)
@@ -77,7 +74,6 @@ if __name__ == "__main__":
             service_list = lister.get_service_list(header=header,
                                                    without_tasks=without_tasks,
                                                    blacklist=blacklist,
-                                                   cachefile=cachefile,
                                                    timezone=timezone)
             if response_type in [None, "json"]:
                 resp = Response(json.dumps(service_list), mimetype=mime.json)
@@ -88,8 +84,7 @@ if __name__ == "__main__":
 
         # Ну или отдаём из кеша
         else:
-            with open(cachefile, "r") as cache_file:
-                service_list = json.loads(cache_file.read())
+            service_list = lister.last_response
             if response_type in [None, "json"]:
                 resp = Response(json.dumps(service_list), mimetype=mime.json)
             elif response_type == "xml":
@@ -101,12 +96,11 @@ if __name__ == "__main__":
     @api.route('/ajax', methods=['GET'])
     def get_list_for_ajax():
         # Если нет CachedResp.json
-        if not exists(cachefile):
+        if lister.last_response is None:
             service_list = json.dumps(
                 lister.get_service_list(header=header,
                                         without_tasks=without_tasks,
                                         blacklist=blacklist,
-                                        cachefile=cachefile,
                                         timezone=timezone,
                                         ajax=True))
         # Если прошло больше чем app.delta времени
@@ -116,13 +110,11 @@ if __name__ == "__main__":
                 lister.get_service_list(header=header,
                                         without_tasks=without_tasks,
                                         blacklist=blacklist,
-                                        cachefile=cachefile,
                                         timezone=timezone,
                                         ajax=True))
         # Ну или отдаём из кеша
         else:
-            with open(cachefile, "r") as cache_file:
-                service_list = cache_file.read()
+            service_list = json.dumps(lister.last_response)
         resp = Response(service_list, mimetype=mime.json)
         return resp
 
