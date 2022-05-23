@@ -97,9 +97,6 @@ if __name__ == "__main__":
             elif response_type in ["yml", "yaml"]:
                 resp = Response(yaml.dump(service_list))
                 resp.headers["Content-Type"] = "application/yaml"
-
-        # resp = Response(service_list)
-        # resp.headers["Content-Type"] = "application/json"
         return resp
 
     @api.route('/ajax', methods=['GET'])
