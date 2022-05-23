@@ -35,9 +35,7 @@ class ServicesLister:
                          blacklist: str = "",
                          timezone: str = "GMT",
                          ajax=False) -> Any:
-        """Получение списка служб и генерация ответа
-        Сохраняет JSON в временный файл CachedResp.json рядом с main.py
-        """
+        """Получение списка служб и генерация ответа"""
         logging.info("Docker api query started")
         self.last_query_time = time.time()
         # Единственный запрос к API Docker
