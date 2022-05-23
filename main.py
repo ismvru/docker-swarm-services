@@ -8,7 +8,6 @@ import time
 from serviceslister import ServicesLister
 from dict2xml import dict2xml
 import yaml
-import toml
 
 # Основная конфигурация
 config = configparser.ConfigParser()
@@ -47,10 +46,10 @@ if __name__ == "__main__":
     def get_list():
         # Если нет CachedResp.json
         response_type = request.args.get('format')
-        if response_type not in ["xml", "json", "yaml", "yml", "toml", None]:
+        if response_type not in ["xml", "json", "yaml", "yml", None]:
             abort(
                 400,
-                f'format must be json/xml/yaml/yml/toml, not {response_type}')
+                f'format must be json/xml/yaml/yml, not {response_type}')
         if not exists(cachefile):
             service_list = lister.get_service_list(header=header,
                                                    without_tasks=without_tasks,
@@ -66,9 +65,7 @@ if __name__ == "__main__":
             elif response_type in ["yml", "yaml"]:
                 resp = Response(yaml.dump(service_list))
                 resp.headers["Content-Type"] = "application/yaml"
-            elif response_type == "toml":
-                resp = Response(toml.dumps(service_list))
-                resp.headers["Content-Type"] = "application/toml"
+
         # Если прошло больше чем app.delta времени
         elif (int(time.time()) - lister.last_query_time > int(
                 config["app"]["delta"])):
@@ -86,9 +83,7 @@ if __name__ == "__main__":
             elif response_type in ["yml", "yaml"]:
                 resp = Response(yaml.dump(service_list))
                 resp.headers["Content-Type"] = "application/yaml"
-            elif response_type == "toml":
-                resp = Response(toml.dumps(service_list))
-                resp.headers["Content-Type"] = "application/toml"
+
         # Ну или отдаём из кеша
         else:
             with open(cachefile, "r") as cache_file:
@@ -102,9 +97,7 @@ if __name__ == "__main__":
             elif response_type in ["yml", "yaml"]:
                 resp = Response(yaml.dump(service_list))
                 resp.headers["Content-Type"] = "application/yaml"
-            elif response_type == "toml":
-                resp = Response(toml.dumps(service_list))
-                resp.headers["Content-Type"] = "application/toml"
+
         # resp = Response(service_list)
         # resp.headers["Content-Type"] = "application/json"
         return resp

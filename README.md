@@ -22,46 +22,127 @@
 
 Основной Endpoint, для отдачи информации в Confluence
 
+Параметры:
+
+- `format` - формат ответа. `json`, `xml`, `yaml`, `yml`. Параметр не обязательный.
+
 Пример ответа:
 
 ```json
 [
-    {
-        "cluster_name": "docker_swarm",
-        "data": [
-            {
-                "short_id": "ijv2qdz7jl",
-                "name": "portainer-agent_agent",
-                "stack": "portainer-agent",
-                "image": "agent",
-                "tag": "2.10.0",
-                "created": "2022-03-06 20:31:00+03:00",
-                "created_human": "2 months ago",
-                "updated": "2022-05-01 18:00:31+03:00",
-                "updated_human": "2 weeks ago",
-                "tasks_count": 5,
-                "tasks_running": 1,
-                "tasks_shutdown": 4,
-                "cluster_name": "docker_swarm"
-            },
-            {
-                "short_id": "p2d2qqf1pb",
-                "name": "nginx-proxy-manager-external_nginx",
-                "stack": "nginx-proxy-manager-external",
-                "image": "nginx-proxy-manager",
-                "tag": "latest",
-                "created": "2022-05-01 18:13:17+03:00",
-                "created_human": "2 weeks ago",
-                "updated": "2022-05-01 18:13:17+03:00",
-                "updated_human": "2 weeks ago",
-                "tasks_count": 1,
-                "tasks_running": 1,
-                "tasks_shutdown": 0,
-                "cluster_name": "docker_swarm"
-            }
-        ]
-    }
+  {
+    "cluster_name": "docker_swarm",
+    "data": [
+      {
+        "short_id": "ijv2qdz7jl",
+        "name": "portainer-agent_agent",
+        "stack": "portainer-agent",
+        "image": "agent",
+        "tag": "2.10.0",
+        "created": "2022-03-06 20:31:00+03:00",
+        "created_human": "2 months ago",
+        "updated": "2022-05-01 18:00:31+03:00",
+        "updated_human": "3 weeks ago",
+        "replication_mode": "Global",
+        "replica_count": 1,
+        "tasks_count": 5,
+        "tasks_running": 1,
+        "tasks_shutdown": 4,
+        "cluster_name": "docker_swarm"
+      },
+      {
+        "short_id": "p2d2qqf1pb",
+        "name": "nginx-proxy-manager-external_nginx",
+        "stack": "nginx-proxy-manager-external",
+        "image": "nginx-proxy-manager",
+        "tag": "latest",
+        "created": "2022-05-01 18:13:17+03:00",
+        "created_human": "3 weeks ago",
+        "updated": "2022-05-21 02:17:09+03:00",
+        "updated_human": "2 days ago",
+        "replication_mode": "Replicated",
+        "replica_count": 1,
+        "tasks_count": 2,
+        "tasks_running": 1,
+        "tasks_shutdown": 1,
+        "cluster_name": "docker_swarm"
+      }
+    ]
+  }
 ]
+```
+
+```xml
+  <cluster_name>docker_swarm</cluster_name>
+  <data>
+    <cluster_name>docker_swarm</cluster_name>
+    <created>2022-03-06 20:31:00+03:00</created>
+    <created_human>2 months ago</created_human>
+    <image>agent</image>
+    <name>portainer-agent_agent</name>
+    <replica_count>1</replica_count>
+    <replication_mode>Global</replication_mode>
+    <short_id>ijv2qdz7jl</short_id>
+    <stack>portainer-agent</stack>
+    <tag>2.10.0</tag>
+    <tasks_count>5</tasks_count>
+    <tasks_running>1</tasks_running>
+    <tasks_shutdown>4</tasks_shutdown>
+    <updated>2022-05-01 18:00:31+03:00</updated>
+    <updated_human>3 weeks ago</updated_human>
+  </data>
+  <data>
+    <cluster_name>docker_swarm</cluster_name>
+    <created>2022-05-01 18:13:17+03:00</created>
+    <created_human>3 weeks ago</created_human>
+    <image>nginx-proxy-manager</image>
+    <name>nginx-proxy-manager-external_nginx</name>
+    <replica_count>1</replica_count>
+    <replication_mode>Replicated</replication_mode>
+    <short_id>p2d2qqf1pb</short_id>
+    <stack>nginx-proxy-manager-external</stack>
+    <tag>latest</tag>
+    <tasks_count>2</tasks_count>
+    <tasks_running>1</tasks_running>
+    <tasks_shutdown>1</tasks_shutdown>
+    <updated>2022-05-21 02:17:09+03:00</updated>
+    <updated_human>2 days ago</updated_human>
+  </data>
+```
+
+```yaml
+- cluster_name: docker_swarm
+  data:
+  - cluster_name: docker_swarm
+    created: '2022-03-06 20:31:00+03:00'
+    created_human: 2 months ago
+    image: agent
+    name: portainer-agent_agent
+    replica_count: 1
+    replication_mode: Global
+    short_id: ijv2qdz7jl
+    stack: portainer-agent
+    tag: 2.10.0
+    tasks_count: 5
+    tasks_running: 1
+    tasks_shutdown: 4
+    updated: '2022-05-01 18:00:31+03:00'
+    updated_human: 3 weeks ago
+  - cluster_name: docker_swarm
+    created: '2022-05-01 18:13:17+03:00'
+    created_human: 3 weeks ago
+    image: nginx-proxy-manager
+    name: nginx-proxy-manager-external_nginx
+    replica_count: 1
+    replication_mode: Replicated
+    short_id: p2d2qqf1pb
+    stack: nginx-proxy-manager-external
+    tag: latest
+    tasks_count: 2
+    tasks_running: 1
+    tasks_shutdown: 1
+    updated: '2022-05-21 02:17:09+03:00'
+    updated_human: 2 days ago
 ```
 
 Где:
