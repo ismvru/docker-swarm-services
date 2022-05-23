@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from typing import Any
 from flask import Flask, Response, render_template
 from os.path import exists
 import docker
@@ -48,7 +49,7 @@ class ServicesLister:
         self.last_query_time = 0
         logging.debug(f"{self.swarm_version = }")
 
-    def get_service_list(self, ajax=False) -> dict:
+    def get_service_list(self, ajax=False) -> Any:
         """Получение списка служб и генерация ответа
         Сохраняет JSON в временный файл CachedResp.json рядом с main.py
         """
