@@ -54,6 +54,8 @@ $(document).ready(
                     { data: 'stack' },
                     { data: 'image' },
                     { data: 'tag' },
+                    { data: 'replication_mode' },
+                    { data: 'replica_count' },
                     { data: 'tasks_count' },
                     { data: 'tasks_running' },
                     { data: 'tasks_shutdown' },

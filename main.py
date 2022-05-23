@@ -88,6 +88,15 @@ class ServicesLister:
                 service.attrs["UpdatedAt"])[0]
             tmpdct["updated_human"] = self.timestr_humanize(
                 service.attrs["UpdatedAt"])[1]
+            # Режим репликации
+            tmpdct["replication_mode"] = list(
+                service.attrs["Spec"]["Mode"].keys())[0]
+            if tmpdct["replication_mode"] == "Replicated":
+                tmpdct["replica_count"] = service.attrs["Spec"]["Mode"][
+                    "Replicated"]["Replicas"]
+            else:
+                tmpdct["replica_count"] = len(
+                    self.client.nodes.list())
             tasks_running = 0
             tasks_shutdown = 0
             for task in service.tasks():
