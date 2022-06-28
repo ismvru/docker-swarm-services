@@ -57,7 +57,9 @@ if __name__ == "__main__":
         updater = confluence.ConfluenceUploader(
             confluence_url=config["confluence"]["url"],
             confluence_token=config["confluence"]["token"],
-            page_id=config["confluence"]["page_id"])
+            page_id=config["confluence"]["page_id"],
+            attachment_id=config["confluence"]["attachment_id"],
+            delta=int(config["app"]["delta"]))
         updater_thread = threading.Thread(target=updater.worker,
                                           name="ConfluenceUploader.worker",
                                           args=(config["http"]["port"]))
