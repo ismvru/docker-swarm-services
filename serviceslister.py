@@ -25,8 +25,8 @@ class ServicesLister:
             logging.exception(e)
             exit(1)
         self.last_query_time = 0
-        self.last_response: list = None
-        self.last_response_ajax: dict = None
+        self.last_response: list | None = None
+        self.last_response_ajax: dict | None = None
         logging.debug(f"{self.swarm_version = }")
 
     def get_service_list(self,
