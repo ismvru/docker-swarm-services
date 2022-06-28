@@ -75,7 +75,6 @@ class ConfluenceUploader:
             logging.info(
                 "Wake up, Neo. The Matrix has you. Getting swarm services list..."  # noqa: E501
             )
-            # response = requests.get(f"http://localhost:{port}/")
             header = self.config["app"]["header"]
             without_tasks = self.config.getboolean("app", "without_tasks")
             blacklist = self.config["app"]["blacklist"]
