@@ -5,7 +5,7 @@ import logging
 import json
 import configparser
 import time
-from serviceslister import ServicesLister
+import serviceslister.serviceslister
 from dict2xml import dict2xml
 import yaml
 from dataclasses import dataclass
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     timezone = config["app"]["timezone"]
 
     # Инициализируем класс
-    lister = ServicesLister()
+    lister = serviceslister.serviceslister.ServicesLister()
     logging.info("Start api")
     # Инициализируем приложение
     api = Flask(__name__)
