@@ -251,6 +251,13 @@ without_tasks = no
 [http]
 host = 0.0.0.0
 port = 8080
+
+[confluence]
+run_updater = yes
+url = https://confluence.example.com
+token = YourApiToken
+page_id = 111222333
+attachment_id = 333222111
 ```
 
 Где:
@@ -264,6 +271,11 @@ port = 8080
 - `app.without_tasks` - Показывать ли сервисы без запущенных экземпляров. `yes`/`1`/`true`/`no`/`0`/`false`
 - `http.host` - IP, на котором слушает HTTP служба. Один из IP хоста или `0.0.0.0`
 - `http.port` - Порт, на котором слушает HTTP служба. Для использования портов <1024 нужны права пользователя `root` или привелегия `CAP_NET_ADMIN`
+- `confluence.run_updater` - Запускать ли обновлятор приложений в Confluence. `yes`/`1`/`true`/`no`/`0`/`false`
+- `confluence.url` - URL Confluence. Например `https://confluence.example.com`
+- `confluence.token` - Token пользователя Confluence
+- `confluence.page_id` - ID страницы в Confluence, куда выкладывать JSON файл
+- `confluence.attachment_id` - ID приложения в Confluence
 
 ## Сборка Docker образа
 
