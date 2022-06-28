@@ -5,6 +5,7 @@ import logging
 import arrow
 from time import sleep
 import configparser
+import serviceslister
 
 
 class ConfluenceUploader:
@@ -73,12 +74,21 @@ class ConfluenceUploader:
         if self.delta is None:
             raise RuntimeError(
                 "Timedelta is None. Please reinit class with delta arg")
+        lister = serviceslister.ServicesLister()
         while True:
             logging.info(
                 "Wake up, Neo. The Matrix has you. Getting swarm services list..."  # noqa: E501
             )
-            response = requests.get(f"http://localhost:{port}/")
-            response_dict = json.loads(response.text)
+            # response = requests.get(f"http://localhost:{port}/")
+            header = self.config["app"]["header"]
+            without_tasks = self.config.getboolean("app", "without_tasks")
+            blacklist = self.config["app"]["blacklist"]
+            timezone = self.config["app"]["timezone"]
+            response_dict = lister.get_service_list(
+                header=header,
+                without_tasks=without_tasks,
+                blacklist=blacklist,
+                timezone=timezone)
             logging.info("Searching for changes")
             tmpdct = {}
             for service in response_dict[0]["data"]:
@@ -90,7 +100,7 @@ class ConfluenceUploader:
             if self.latest_data != tmpdct:
                 logging.info("Found changes in services. Updating...")
                 with open("UpdaterTempFile.json", "w") as tempfile:
-                    tempfile.write(response.text)
+                    tempfile.write(json.dumps("response_dict", indent=2))
                 self.update_file(attachment_id=self.attachment_id,
                                  file_path="UpdaterTempFile.json")
                 self.latest_data = tmpdct
