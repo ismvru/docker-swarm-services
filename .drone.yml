@@ -42,6 +42,21 @@ steps:
       tags:
         - latest
         - ${DRONE_TAG}
+  - name: Build and push docker - devbuilds
+    image: plugins/docker
+    when:
+      event:
+        exclude:
+          - tag
+    settings:
+      username:
+        from_secret: nexus_user
+      password:
+        from_secret: nexus_pass
+      repo: repo.ismv.ru/${DRONE_REPO_NAME}
+      registry: repo.ismv.ru
+      tags:
+        - dev-${DRONE_BUILD_NUMBER}
   - name: send tg message
     image: appleboy/drone-telegram
     settings:
