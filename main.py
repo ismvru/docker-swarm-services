@@ -5,7 +5,8 @@ import logging
 import json
 import configparser
 import time
-import serviceslister.serviceslister
+from helpers import serviceslister
+from helpers import confluence
 from dict2xml import dict2xml
 import yaml
 from dataclasses import dataclass
@@ -24,6 +25,13 @@ if not exists("config.ini"):
     }
     loglevel = config["app"]["loglevel"]
     config["http"] = {"host": "0.0.0.0", "port": 8080}  # nosec
+    config["confluence"] = {
+        "run_updater": "no",
+        "url": "https://confluence.example.com",
+        "token": "YourTokenHere",
+        "page_id": 123456789,
+        "attachment_id": 123456789
+    }
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
 logging.basicConfig(level=config["app"]["loglevel"])
@@ -41,9 +49,22 @@ if __name__ == "__main__":
     without_tasks = config.getboolean("app", "without_tasks")
     blacklist = config["app"]["blacklist"]
     timezone = config["app"]["timezone"]
+    run_updater = config.getboolean("confluence", "run_updater")
+    # Если у нас config["confluence"]["run_updater"] == True
+    # запускаем обновлятор в отдельном потоке
+    if run_updater:
+        import threading
+        updater = confluence.ConfluenceUploader(
+            confluence_url=config["confluence"]["url"],
+            confluence_token=config["confluence"]["token"],
+            page_id=config["confluence"]["page_id"])
+        updater_thread = threading.Thread(target=updater.worker,
+                                          name="ConfluenceUploader.worker",
+                                          args=(config["http"]["port"]))
+        updater_thread.start()
 
     # Инициализируем класс
-    lister = serviceslister.serviceslister.ServicesLister()
+    lister = serviceslister.ServicesLister()
     logging.info("Start api")
     # Инициализируем приложение
     api = Flask(__name__)
