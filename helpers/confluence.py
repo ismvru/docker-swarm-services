@@ -35,7 +35,7 @@ class ConfluenceUploader:
         self.latest_data: dict = {}
         # Test confluence api
         response = requests.get(f"{self.confluence}/rest/api/user/current")
-        current_user = json.loads(response.text)["username"]
+        current_user = json.loads(response.text)
         logging.info(f"Current user: {current_user}")
         logging.info("Init ConfluenceUploader - done")
 
