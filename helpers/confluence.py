@@ -10,12 +10,7 @@ from .serviceslister import ServicesLister
 
 class ConfluenceUploader:
 
-    def __init__(self,
-                 confluence_url: str,
-                 confluence_token: str,
-                 page_id: int,
-                 attachment_id: int | str,
-                 delta: int = None) -> None:
+    def __init__(self) -> None:
         """ConfluenceUploader
         confluence_url - Confluence server url
         confluence_token - Confluence token
@@ -25,12 +20,12 @@ class ConfluenceUploader:
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
         logging.info("Init ConfluenceUploader - start")
-        self.confluence = confluence_url
-        self.token = confluence_token
-        self.page_id = page_id
+        self.confluence = self.config["confluence"]["url"]
+        self.token = self.config["confluence"]["token"]
+        self.page_id = self.config["confluence"]["page_id"]
         self.page_url = f"{self.confluence}/rest/api/content/{self.page_id}"  # noqa: E501
-        self.attachment_id = attachment_id,
-        self.delta = delta
+        self.attachment_id = self.config["confluence"]["attachment_id"]
+        self.delta = int(self.config["app"]["delta"])
         self.headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {self.token}",
@@ -43,6 +38,7 @@ class ConfluenceUploader:
         current_user = json.loads(response.text)
         logging.info(f"Current user: {current_user}")
         logging.info("Init ConfluenceUploader - done")
+        logging.debug(f"{self.__dict__ = }")
 
     def update_file(self, attachment_id: str | int, file_path: str) -> bool:
         """Update attachment file
@@ -100,7 +96,7 @@ class ConfluenceUploader:
             if self.latest_data != tmpdct:
                 logging.info("Found changes in services. Updating...")
                 with open("UpdaterTempFile.json", "w") as tempfile:
-                    tempfile.write(json.dumps("response_dict", indent=2))
+                    tempfile.write(json.dumps(response_dict, indent=2))
                 self.update_file(attachment_id=self.attachment_id,
                                  file_path="UpdaterTempFile.json")
                 self.latest_data = tmpdct

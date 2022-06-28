@@ -54,12 +54,7 @@ if __name__ == "__main__":
     # запускаем обновлятор в отдельном потоке
     if run_updater:
         import threading
-        updater = confluence.ConfluenceUploader(
-            confluence_url=config["confluence"]["url"],
-            confluence_token=config["confluence"]["token"],
-            page_id=config["confluence"]["page_id"],
-            attachment_id=config["confluence"]["attachment_id"],
-            delta=int(config["app"]["delta"]))
+        updater = confluence.ConfluenceUploader()
         updater_thread = threading.Thread(target=updater.worker,
                                           name="ConfluenceUploader.worker")
         updater_thread.start()
