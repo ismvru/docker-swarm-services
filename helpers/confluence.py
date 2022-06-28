@@ -17,15 +17,18 @@ class ConfluenceUploader:
         page_id - Confluence page ID
         attachment_id - Confluence attachment ID
         delta - delta between worker wake-ups"""
+        logging.info("Init ConfluenceUploader - start")
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
-        logging.info("Init ConfluenceUploader - start")
+        logging.info("Configuration file loaded")
         self.confluence = self.config["confluence"]["url"]
+        logging.info(f"Confluence address: {self.confluence}")
         self.token = self.config["confluence"]["token"]
         self.page_id = self.config["confluence"]["page_id"]
         self.page_url = f"{self.confluence}/rest/api/content/{self.page_id}"  # noqa: E501
         self.attachment_id = self.config["confluence"]["attachment_id"]
         self.delta = int(self.config["app"]["delta"])
+        logging.info(f"Update time: {self.delta}")
         self.headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {self.token}",
@@ -35,8 +38,8 @@ class ConfluenceUploader:
         # Test confluence api
         response = requests.get(f"{self.confluence}/rest/api/user/current",
                                 headers=self.headers)
-        current_user = json.loads(response.text)
-        logging.info(f"Current user: {current_user}")
+        current_user = json.loads(response.text)["username"]
+        logging.info(f"{current_user = }")
         logging.info("Init ConfluenceUploader - done")
         logging.debug(f"{self.__dict__ = }")
 
@@ -100,5 +103,7 @@ class ConfluenceUploader:
                                  file_path="UpdaterTempFile.json")
                 self.latest_data = tmpdct
                 logging.info("Update complete!")
-            logging.info("Sleeping...")
+            else:
+                logging.info("There is no changes.")
+            logging.info("Going to sleep")
             sleep(self.delta)
