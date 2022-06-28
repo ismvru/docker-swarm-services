@@ -2,3 +2,4 @@
 config.ini
 test*
 retag.sh
+helpers/__pycache__

@@ -5,7 +5,7 @@ import logging
 import arrow
 from time import sleep
 import configparser
-import serviceslister
+from .serviceslister import ServicesLister
 
 
 class ConfluenceUploader:
@@ -70,11 +70,11 @@ class ConfluenceUploader:
         localdate = utcdate.to(timezone)
         return localdate.format()
 
-    def worker(self, port: int):
+    def worker(self):
         if self.delta is None:
             raise RuntimeError(
                 "Timedelta is None. Please reinit class with delta arg")
-        lister = serviceslister.ServicesLister()
+        lister = ServicesLister()
         while True:
             logging.info(
                 "Wake up, Neo. The Matrix has you. Getting swarm services list..."  # noqa: E501
