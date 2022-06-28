@@ -4,6 +4,7 @@ import json
 import logging
 import arrow
 from time import sleep
+import configparser
 
 
 class ConfluenceUploader:
@@ -20,6 +21,8 @@ class ConfluenceUploader:
         page_id - Confluence page ID
         attachment_id - Confluence attachment ID
         delta - delta between worker wake-ups"""
+        self.config = configparser.ConfigParser()
+        self.config.read("../config.ini")
         logging.info("Init ConfluenceUploader - start")
         self.confluence = confluence_url
         self.token = confluence_token
@@ -34,7 +37,8 @@ class ConfluenceUploader:
         }
         self.latest_data: dict = {}
         # Test confluence api
-        response = requests.get(f"{self.confluence}/rest/api/user/current")
+        response = requests.get(f"{self.confluence}/rest/api/user/current",
+                                headers=self.headers)
         current_user = json.loads(response.text)
         logging.info(f"Current user: {current_user}")
         logging.info("Init ConfluenceUploader - done")
