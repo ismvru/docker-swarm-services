@@ -23,7 +23,7 @@ class ConfluenceUploader:
         attachment_id - Confluence attachment ID
         delta - delta between worker wake-ups"""
         self.config = configparser.ConfigParser()
-        self.config.read("../config.ini")
+        self.config.read("config.ini")
         logging.info("Init ConfluenceUploader - start")
         self.confluence = confluence_url
         self.token = confluence_token
