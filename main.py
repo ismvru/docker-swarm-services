@@ -62,7 +62,7 @@ if __name__ == "__main__":
             delta=int(config["app"]["delta"]))
         updater_thread = threading.Thread(target=updater.worker,
                                           name="ConfluenceUploader.worker",
-                                          args=(config["http"]["port"]))
+                                          args=(config["http"]["port"], ))
         updater_thread.start()
 
     # Инициализируем класс
