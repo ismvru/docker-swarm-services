@@ -46,6 +46,7 @@ without_tasks = config.getboolean("app", "without_tasks")
 blacklist = config["app"]["blacklist"]
 timezone = config["app"]["timezone"]
 run_updater = config.getboolean("confluence", "run_updater")
+
 # Если у нас config["confluence"]["run_updater"] == True
 # запускаем обновлятор в отдельном потоке
 try:
@@ -67,8 +68,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
+# Api responses
 @app.get("/")
 async def get_list(format: str | None = None):
+    """Get services list"""
     if format not in ["xml", "json", "yaml", "yml", None]:
         raise HTTPException(
             400, detail=f'format must be json/xml/yaml/yml, not {format}')
@@ -87,6 +90,7 @@ async def get_list(format: str | None = None):
 
 @app.get("/ajax")
 async def get_list_for_ajax():
+    """Get services list for datatable"""
     return ORJSONResponse(
         lister.get_service_list(header=header,
                                 without_tasks=without_tasks,
@@ -97,4 +101,5 @@ async def get_list_for_ajax():
 
 @app.get("/table", response_class=HTMLResponse)
 async def render_table(request: Request):
+    """Render datatable"""
     return templates.TemplateResponse("table.html", {"request": request})
