@@ -230,6 +230,7 @@
 - Python 3.10+
 - [req.txt](./req.txt)
   - [req-flask.txt](./req-flask.txt) для Flask версии
+  - [req-fastapi.txt](./req-fastapi.txt) для FastAPI версии
 - Кластер docker swarm
 - Доступ на чтение к /var/run/docker.sock
 
@@ -240,10 +241,8 @@
 ```ini
 [app]
 loglevel = INFO
-delta = 600
 blacklist = 
 header = docker_swarm
-cachefile = CachedResp.json
 timezone = Europe/Moscow
 without_tasks = no
 
@@ -258,10 +257,8 @@ attachment_id = 333222111
 Где:
 
 - `app.loglevel` - уровень логирования службы. `DEBUG`/`INFO`/`WARNING`/`ERROR`
-- `app.delta` - минимальное время между запросами к `/var/run/docker.sock` в секундах
 - `app.blacklist` - список названий сервисов, разделённых запятой, которые не надо включать в JSON. `service_app1,service_app2,service_app3`
 - `app.header` - значение элемента JSON `cluster_name`
-- `app.cachefile` - путь до файла с кешем ответов от docker
 - `app.timezone` - Временная зона для вывода created и updated. См. [список временных зон](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), List -> TZ database name
 - `app.without_tasks` - Показывать ли сервисы без запущенных экземпляров. `yes`/`1`/`true`/`no`/`0`/`false`
 - `confluence.run_updater` - Запускать ли обновлятор приложений в Confluence. `yes`/`1`/`true`/`no`/`0`/`false`
@@ -283,8 +280,10 @@ docker build . --tag registry/image:tag
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r req.txt -r req-flask.txt
-./start-service.sh
+pip install -r req.txt -r req-flask.txt  # For Flask version
+pip install -r req.txt -r req-fastapi.txt  # For FastAPI version
+./start-service.sh flask  # For Flask version
+./start-service.sh fastapi  # For FastAPI version
 ```
 
 ### docker

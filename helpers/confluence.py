@@ -15,8 +15,7 @@ class ConfluenceUploader:
         confluence_url - Confluence server url
         confluence_token - Confluence token
         page_id - Confluence page ID
-        attachment_id - Confluence attachment ID
-        delta - delta between worker wake-ups"""
+        attachment_id - Confluence attachment ID"""
         logging.info("Init ConfluenceUploader - start")
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
@@ -27,8 +26,6 @@ class ConfluenceUploader:
         self.page_id = self.config["confluence"]["page_id"]
         self.page_url = f"{self.confluence}/rest/api/content/{self.page_id}"  # noqa: E501
         self.attachment_id = self.config["confluence"]["attachment_id"]
-        self.delta = int(self.config["app"]["delta"])
-        logging.info(f"Update time: {self.delta}")
         self.headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {self.token}",
@@ -70,9 +67,6 @@ class ConfluenceUploader:
         return localdate.format()
 
     def worker(self):
-        if self.delta is None:
-            raise RuntimeError(
-                "Timedelta is None. Please reinit class with delta arg")
         lister = ServicesLister()
         while True:
             logging.info(
@@ -106,4 +100,4 @@ class ConfluenceUploader:
             else:
                 logging.info("There is no changes.")
             logging.info("Going to sleep")
-            sleep(self.delta)
+            sleep(600)

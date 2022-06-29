@@ -3,7 +3,7 @@ import docker
 import logging
 from typing import Any
 import arrow
-import time
+from cachetools import cached, TTLCache
 
 
 class ServicesLister:
@@ -16,11 +16,9 @@ class ServicesLister:
         self.client = docker.from_env()
         # Если не swarm - тоже выдаст exception
         self.swarm_version = self.client.swarm.version
-        self.last_query_time = 0
-        self.last_response: list | None = None
-        self.last_response_ajax: dict | None = None
         logging.debug(f"{self.swarm_version = }")
 
+    @cached(cache=TTLCache(maxsize=128, ttl=600))
     def get_service_list(self,
                          header: str = "docker_swarm",
                          without_tasks: bool = False,
@@ -29,7 +27,6 @@ class ServicesLister:
                          ajax=False) -> Any:
         """Получение списка служб и генерация ответа"""
         logging.info("Docker api query started")
-        self.last_query_time = time.time()
         # Единственный запрос к API Docker
         services = self.client.services.list()
         result = {"cluster_name": header, "data": []}
@@ -86,10 +83,8 @@ class ServicesLister:
             result["data"].append(tmpdct)
         logging.info("Docker api query finished")
         if ajax:
-            self.last_response_ajax = result
             return result
         else:
-            self.last_response = [result]
             return [result]
 
     def timestr_humanize(self, timestr: str, timezone="GMT") -> tuple:

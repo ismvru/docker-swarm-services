@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
-from flask import Flask, Response, render_template, request, abort
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import ORJSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from os.path import exists
 import logging
-import json
 import configparser
 from helpers import serviceslister
 from helpers import confluence
@@ -36,7 +37,6 @@ logging.basicConfig(level=config["app"]["loglevel"])
 
 @dataclass
 class mime:
-    json: str = "application/json"
     xml: str = "text/xml"
     yaml: str = "text/yaml"
 
@@ -61,44 +61,40 @@ except Exception:
 # Инициализируем класс
 lister = serviceslister.ServicesLister()
 logging.info("Start api")
-# Инициализируем приложение
-api = Flask(__name__)
+
+app = FastAPI(redoc_url=None)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 
-# Добавляем обработку запроса "GET /"
-@api.route('/', methods=['GET'])
-def get_list():
-    response_type = request.args.get('format')
-    if response_type not in ["xml", "json", "yaml", "yml", None]:
-        abort(400, f'format must be json/xml/yaml/yml, not {response_type}')
+@app.get("/")
+async def get_list(format: str | None = None):
+    if format not in ["xml", "json", "yaml", "yml", None]:
+        raise HTTPException(
+            400, detail=f'format must be json/xml/yaml/yml, not {format}')
     service_list = lister.get_service_list(header=header,
                                            without_tasks=without_tasks,
                                            blacklist=blacklist,
                                            timezone=timezone)
-    if response_type in [None, "json"]:
-        resp = Response(json.dumps(service_list), mimetype=mime.json)
-    elif response_type == "xml":
-        resp = Response(dict2xml(service_list), mimetype=mime.xml)
-    elif response_type in ["yml", "yaml"]:
-        resp = Response(yaml.dump(service_list), mimetype=mime.yaml)
+    if format in [None, "json"]:
+        resp = ORJSONResponse(content=service_list)
+    elif format == "xml":
+        resp = Response(content=dict2xml(service_list), media_type=mime.xml)
+    elif format in ["yml", "yaml"]:
+        resp = Response(content=yaml.dump(service_list), media_type=mime.yaml)
     return resp
 
 
-@api.route('/ajax', methods=['GET'])
-def get_list_for_ajax():
-    service_list = json.dumps(
+@app.get("/ajax")
+async def get_list_for_ajax():
+    return ORJSONResponse(
         lister.get_service_list(header=header,
                                 without_tasks=without_tasks,
                                 blacklist=blacklist,
                                 timezone=timezone,
                                 ajax=True))
-    resp = Response(service_list, mimetype=mime.json)
-    return resp
 
 
-@api.route('/table', methods=['GET'])
-def render_table():
-    return render_template("table.html")
-
-
-api.run()
+@app.get("/table", response_class=HTMLResponse)
+async def render_table():
+    return templates.TemplateResponse("table.html")
