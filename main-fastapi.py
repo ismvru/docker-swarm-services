@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -96,5 +96,5 @@ async def get_list_for_ajax():
 
 
 @app.get("/table", response_class=HTMLResponse)
-async def render_table():
-    return templates.TemplateResponse("table.html")
+async def render_table(request: Request):
+    return templates.TemplateResponse("table.html", {"request": request})
