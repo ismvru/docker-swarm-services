@@ -270,7 +270,22 @@ attachment_id = 333222111
 ## Сборка Docker образа
 
 ```bash
-docker build . --tag registry/image:tag
+# AIO
+docker build . \
+  --tag repo.ismv.ru/py-docker-swarm-services:TAG \
+  --tag repo.ismv.ru/py-docker-swarm-services:latest
+
+# Only Flask build
+docker build . \
+  --file Dockerfile-flask
+  --tag repo.ismv.ru/py-docker-swarm-services:flask-TAG \
+  --tag repo.ismv.ru/py-docker-swarm-services:flask-latest
+
+# Only FastAPI build
+docker build . \
+  --file Dockerfile-fastapi
+  --tag repo.ismv.ru/py-docker-swarm-services:fastapi-TAG \
+  --tag repo.ismv.ru/py-docker-swarm-services:fastapi-latest
 ```
 
 ## Запуск
@@ -280,8 +295,10 @@ docker build . --tag registry/image:tag
 ```bash
 python -m venv .venv
 source .venv/bin/activate
+
 pip install -r req.txt -r req-flask.txt  # For Flask version
 pip install -r req.txt -r req-fastapi.txt  # For FastAPI version
+
 ./start-service.sh flask  # For Flask version
 ./start-service.sh fastapi  # For FastAPI version
 ```
@@ -291,13 +308,48 @@ pip install -r req.txt -r req-fastapi.txt  # For FastAPI version
 Запуск со стандартной конфигурацией
 
 ```bash
-docker run -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock:ro registry/image:tag
+# AIO, by default running FastAPI
+docker run -d \
+  -p 8080:8080 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  repo.ismv.ru/py-docker-swarm-services:latest
+
+# Flask
+docker run -d \
+  -p 8080:8080 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  repo.ismv.ru/py-docker-swarm-services:flask-latest  
+
+# FastAPI
+docker run -d \
+  -p 8080:8080 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  repo.ismv.ru/py-docker-swarm-services:fastapi-latest
 ```
 
 Запуск со своей конфигурацией
 
 ```bash
-docker run -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock:ro -v $PWD/config.ini:/app/config.ini registry/image:tag
+# AIO, by default running FastAPI
+docker run -d \
+  -p 8080:8080 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v $PWD/config.ini:/app/config.ini \
+  repo.ismv.ru/py-docker-swarm-services:latest
+
+# Flask
+docker run -d \
+  -p 8080:8080 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v $PWD/config.ini:/app/config.ini \
+  repo.ismv.ru/py-docker-swarm-services:flask-latest
+
+# FastAPI
+docker run -d \
+  -p 8080:8080 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v $PWD/config.ini:/app/config.ini \
+  repo.ismv.ru/py-docker-swarm-services:fastapi-latest
 ```
 
 ### docker-compose
