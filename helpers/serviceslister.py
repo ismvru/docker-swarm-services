@@ -18,7 +18,7 @@ class ServicesLister:
         self.swarm_version = self.client.swarm.version
         logging.debug(f"{self.swarm_version = }")
 
-    @cached(cache=TTLCache(maxsize=128, ttl=600))
+    @cached(cache=TTLCache(maxsize=128, ttl=300))
     def get_service_list(self,
                          header: str = "docker_swarm",
                          without_tasks: bool = False,
