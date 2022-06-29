@@ -12,18 +12,10 @@ class ServicesLister:
 
     def __init__(self) -> None:
         """Инициализируем все переменные"""
-        try:
-            self.client = docker.from_env()
-        except Exception as e:
-            # Если не смогли подключиться к Docker - выходим
-            logging.exception(e)
-            exit(1)
-        try:
-            self.swarm_version = self.client.swarm.version
-        except AttributeError as e:
-            # Если не swarm - тоже выходим
-            logging.exception(e)
-            exit(1)
+        # Если не смогли подключиться к Docker - выдаст exception
+        self.client = docker.from_env()
+        # Если не swarm - тоже выдаст exception
+        self.swarm_version = self.client.swarm.version
         self.last_query_time = 0
         self.last_response: list | None = None
         self.last_response_ajax: dict | None = None

@@ -227,10 +227,9 @@
 
 ## Требования
 
-- Python 3.8+
-- python-flask
-- python-docker
-- python-arrow
+- Python 3.10+
+- [req.txt](./req.txt)
+  - [req-flask.txt](./req-flask.txt) для Flask версии
 - Кластер docker swarm
 - Доступ на чтение к /var/run/docker.sock
 
@@ -247,10 +246,6 @@ header = docker_swarm
 cachefile = CachedResp.json
 timezone = Europe/Moscow
 without_tasks = no
-
-[http]
-host = 0.0.0.0
-port = 8080
 
 [confluence]
 run_updater = yes
@@ -269,8 +264,6 @@ attachment_id = 333222111
 - `app.cachefile` - путь до файла с кешем ответов от docker
 - `app.timezone` - Временная зона для вывода created и updated. См. [список временных зон](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), List -> TZ database name
 - `app.without_tasks` - Показывать ли сервисы без запущенных экземпляров. `yes`/`1`/`true`/`no`/`0`/`false`
-- `http.host` - IP, на котором слушает HTTP служба. Один из IP хоста или `0.0.0.0`
-- `http.port` - Порт, на котором слушает HTTP служба. Для использования портов <1024 нужны права пользователя `root` или привелегия `CAP_NET_ADMIN`
 - `confluence.run_updater` - Запускать ли обновлятор приложений в Confluence. `yes`/`1`/`true`/`no`/`0`/`false`
 - `confluence.url` - URL Confluence. Например `https://confluence.example.com`
 - `confluence.token` - Token пользователя Confluence
@@ -290,8 +283,8 @@ docker build . --tag registry/image:tag
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip instarr -r req.txt
-./main.py
+pip install -r req.txt -r req-flask.txt
+./start-service.sh
 ```
 
 ### docker

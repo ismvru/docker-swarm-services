@@ -1,5 +1,12 @@
+# Python cache and venv
 .venv
+helpers/__pycache__
+__pycache__
+
+# Dev configs and scripts
 config.ini
 test*
 retag.sh
-helpers/__pycache__
+
+# Unneeded folders
+logs
