@@ -26,15 +26,27 @@ class ConfluenceUploader:
         self.page_id = self.config["confluence"]["page_id"]
         self.page_url = f"{self.confluence}/rest/api/content/{self.page_id}"  # noqa: E501
         self.attachment_id = self.config["confluence"]["attachment_id"]
-        if self.config["confluence"]["start_time"] == "":
+        try:
+            if self.config["confluence"]["start_time"] == "":
+                self.start_time = None
+            else:
+                self.start_time = self.config["confluence"]["start_time"]
+            if self.config["confluence"]["end_time"] == "":
+                self.end_time = None
+            else:
+                self.end_time = self.config["confluence"]["end_time"]
+        except Exception as e:
+            logging.exception(e)
+            logging.info("Will use default values for start_time and end_time")
             self.start_time = None
-        else:
-            self.start_time = self.config["confluence"]["start_time"]
-        if self.config["confluence"]["end_time"] == "":
             self.end_time = None
-        else:
-            self.end_time = self.config["confluence"]["end_time"]
-        self.sleep_time = self.config.getint("confluence", "sleep_time")
+        try:
+            self.sleep_time = self.config.getint("confluence", "sleep_time")
+        except Exception as e:
+            logging.exception(e)
+            logging.info("Will use default values for sleep_time")
+            self.sleep_time = 600
+
         self.headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {self.token}",
