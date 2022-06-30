@@ -56,23 +56,6 @@ try:
     run_updater = config.getboolean("confluence", "run_updater")
 except Exception:
     run_updater = False
-if run_updater:
-    try:
-        if config["confluence"]["start_time"] == "":
-            start_time = None
-        else:
-            start_time = config["app"]["start_time"]
-        if config["confluence"]["end_time"] == "":
-            end_time = None
-        else:
-            end_time = config["confluence"]["end_time"]
-    except KeyError:
-        start_time = None
-        end_time = None
-    try:
-        sleep_time = config.getint("confluence", "sleep_time")
-    except configparser.NoOptionError:
-        sleep_time = 600
 
 # Если у нас config["confluence"]["run_updater"] == True
 # запускаем обновлятор в отдельном потоке
@@ -81,12 +64,7 @@ try:
         import threading
         updater = confluence.ConfluenceUploader()
         updater_thread = threading.Thread(target=updater.worker,
-                                          name="ConfluenceUploader.worker",
-                                          kwargs={
-                                              "start_time": start_time,
-                                              "end_time": end_time,
-                                              "sleep_time": sleep_time
-                                          })
+                                          name="ConfluenceUploader.worker")
         updater_thread.start()
 except Exception:
     exit(1)

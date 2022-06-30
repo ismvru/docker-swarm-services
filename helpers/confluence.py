@@ -26,6 +26,22 @@ class ConfluenceUploader:
         self.page_id = self.config["confluence"]["page_id"]
         self.page_url = f"{self.confluence}/rest/api/content/{self.page_id}"  # noqa: E501
         self.attachment_id = self.config["confluence"]["attachment_id"]
+        try:
+            if self.config["confluence"]["start_time"] == "":
+                self.start_time = None
+            else:
+                self.start_time = self.config["app"]["start_time"]
+            if self.config["confluence"]["end_time"] == "":
+                self.end_time = None
+            else:
+                self.end_time = self.config["confluence"]["end_time"]
+        except KeyError:
+            self.start_time = None
+            self.end_time = None
+        try:
+            self.sleep_time = self.config.getint("confluence", "sleep_time")
+        except configparser.NoOptionError:
+            self.sleep_time = 600
         self.headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {self.token}",
@@ -66,10 +82,7 @@ class ConfluenceUploader:
         localdate = utcdate.to(timezone)
         return localdate.format()
 
-    def worker(self,
-               start_time: str = None,
-               end_time: str = None,
-               sleep_time: int = 600):
+    def worker(self):
         """Background worker
         infinite trys to detect changes in docker services
         and push json to confluence if services is changed
@@ -79,11 +92,11 @@ class ConfluenceUploader:
         lister = ServicesLister()
         while True:
             logging.info("Wake up, Neo. The Matrix has you.")
-            logging.debug(f"{start_time = }, {end_time = }, {sleep_time = }")
             is_worktime = True
-            if start_time is not None and end_time is not None:
+            if self.start_time is not None and self.end_time is not None:
                 try:
-                    is_worktime = self.is_worktime(start_time, end_time)
+                    is_worktime = self.is_worktime(self.start_time,
+                                                   self.end_time)
                 except arrow.parser.ParserMatchError as e:
                     logging.exception(e)
             logging.debug(f"{is_worktime = }")
@@ -121,8 +134,9 @@ class ConfluenceUploader:
                 logging.info("Going to sleep")
             else:
                 logging.info(
-                    f"Nope, i'll work in interval {start_time} - {end_time}")
-            sleep(sleep_time)
+                    f"Nope, i'll work in interval {self.start_time} - {self.end_time}"  # noqa: E501
+                )
+            sleep(self.sleep_time)
 
     def is_worktime(self, start_time: str, end_time: str) -> bool:
         """Decides if start_time <= now() <= end_time
