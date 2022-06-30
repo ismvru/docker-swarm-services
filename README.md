@@ -229,8 +229,6 @@
 
 - Python 3.10+
 - [req.txt](./req.txt)
-  - [req-flask.txt](./req-flask.txt) для Flask версии
-  - [req-fastapi.txt](./req-fastapi.txt) для FastAPI версии
 - Кластер docker swarm
 - Доступ на чтение к /var/run/docker.sock
 
@@ -252,6 +250,10 @@ url = https://confluence.example.com
 token = YourApiToken
 page_id = 111222333
 attachment_id = 333222111
+start_time = 09:00
+end_time = 18:00
+sleep_time = 600
+
 ```
 
 Где:
@@ -266,26 +268,16 @@ attachment_id = 333222111
 - `confluence.token` - Token пользователя Confluence
 - `confluence.page_id` - ID страницы в Confluence, куда выкладывать JSON файл
 - `confluence.attachment_id` - ID приложения в Confluence
+- `confluence.start_time` - Время, раньше которого не будет работать confluence updater. Формат: `HH:mm` (например `09:00`)
+- `confluence.end_time` - Время, позже которого не будет работать confluence updater. Формат: `HH:mm` (например `18:00`)
+- `confluence.sleep_time` - Время в секундах ожидания между проверками, изменились ли сервисы или нет. Целое число
 
 ## Сборка Docker образа
 
 ```bash
-# AIO
 docker build . \
   --tag repo.ismv.ru/py-docker-swarm-services:TAG \
   --tag repo.ismv.ru/py-docker-swarm-services:latest
-
-# Only Flask build
-docker build . \
-  --file Dockerfile-flask
-  --tag repo.ismv.ru/py-docker-swarm-services:flask-TAG \
-  --tag repo.ismv.ru/py-docker-swarm-services:flask-latest
-
-# Only FastAPI build
-docker build . \
-  --file Dockerfile-fastapi
-  --tag repo.ismv.ru/py-docker-swarm-services:fastapi-TAG \
-  --tag repo.ismv.ru/py-docker-swarm-services:fastapi-latest
 ```
 
 ## Запуск
@@ -295,12 +287,8 @@ docker build . \
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-
-pip install -r req.txt -r req-flask.txt  # For Flask version
-pip install -r req.txt -r req-fastapi.txt  # For FastAPI version
-
-./start-service.sh flask  # For Flask version
-./start-service.sh fastapi  # For FastAPI version
+pip install -r req.txt
+./start-service.sh
 ```
 
 ### docker
@@ -308,48 +296,20 @@ pip install -r req.txt -r req-fastapi.txt  # For FastAPI version
 Запуск со стандартной конфигурацией
 
 ```bash
-# AIO, by default running FastAPI
 docker run -d \
   -p 8080:8080 \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
   repo.ismv.ru/py-docker-swarm-services:latest
-
-# Flask
-docker run -d \
-  -p 8080:8080 \
-  -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  repo.ismv.ru/py-docker-swarm-services:flask-latest  
-
-# FastAPI
-docker run -d \
-  -p 8080:8080 \
-  -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  repo.ismv.ru/py-docker-swarm-services:fastapi-latest
 ```
 
 Запуск со своей конфигурацией
 
 ```bash
-# AIO, by default running FastAPI
 docker run -d \
   -p 8080:8080 \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
   -v $PWD/config.ini:/app/config.ini \
   repo.ismv.ru/py-docker-swarm-services:latest
-
-# Flask
-docker run -d \
-  -p 8080:8080 \
-  -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  -v $PWD/config.ini:/app/config.ini \
-  repo.ismv.ru/py-docker-swarm-services:flask-latest
-
-# FastAPI
-docker run -d \
-  -p 8080:8080 \
-  -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  -v $PWD/config.ini:/app/config.ini \
-  repo.ismv.ru/py-docker-swarm-services:fastapi-latest
 ```
 
 ### docker-compose

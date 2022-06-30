@@ -1,7 +1,0 @@
-FROM python:3-slim
-WORKDIR /app
-COPY req.txt req-fastapi.txt /app/
-RUN pip --no-cache-dir install -r req.txt -r req-fastapi.txt
-COPY . /app/
-ENV PATH ${PATH}:/app/
-CMD ["start-service.sh", "fastapi"]

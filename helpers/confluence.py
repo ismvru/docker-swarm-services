@@ -66,38 +66,72 @@ class ConfluenceUploader:
         localdate = utcdate.to(timezone)
         return localdate.format()
 
-    def worker(self):
+    def worker(self,
+               start_time: str = None,
+               end_time: str = None,
+               sleep_time: int = 600):
+        """Background worker
+        infinite trys to detect changes in docker services
+        and push json to confluence if services is changed
+        start_time: see is_worktime
+        end_time: see is_worktime
+        sleep_time: time for sleep between trys"""
         lister = ServicesLister()
         while True:
-            logging.info(
-                "Wake up, Neo. The Matrix has you. Getting swarm services list..."  # noqa: E501
-            )
-            header = self.config["app"]["header"]
-            without_tasks = self.config.getboolean("app", "without_tasks")
-            blacklist = self.config["app"]["blacklist"]
-            timezone = self.config["app"]["timezone"]
-            response_dict = lister.get_service_list(
-                header=header,
-                without_tasks=without_tasks,
-                blacklist=blacklist,
-                timezone=timezone)
-            logging.info("Searching for changes")
-            tmpdct = {}
-            for service in response_dict[0]["data"]:
-                tmpdct[service["short_id"]] = {
-                    "image": service["image"],
-                    "tag": service["tag"],
-                    "replica_running": service["replica_running"]
-                }
-            if self.latest_data != tmpdct:
-                logging.info("Found changes in services. Updating...")
-                with open("UpdaterTempFile.json", "w") as tempfile:
-                    tempfile.write(json.dumps(response_dict, indent=2))
-                self.update_file(attachment_id=self.attachment_id,
-                                 file_path="UpdaterTempFile.json")
-                self.latest_data = tmpdct
-                logging.info("Update complete!")
+            logging.info("Wake up, Neo. The Matrix has you.")
+            is_worktime = True
+            if start_time is not None and end_time is not None:
+                try:
+                    is_worktime = self.is_worktime(start_time, end_time)
+                except arrow.parser.ParserMatchError as e:
+                    logging.exception(e)
+            if is_worktime:
+                logging.info("Getting swarm services list...")
+                header = self.config["app"]["header"]
+                without_tasks = self.config.getboolean("app", "without_tasks")
+                blacklist = self.config["app"]["blacklist"]
+                timezone = self.config["app"]["timezone"]
+                response_dict = lister.get_service_list(
+                    header=header,
+                    without_tasks=without_tasks,
+                    blacklist=blacklist,
+                    timezone=timezone)
+                logging.info("Searching for changes")
+                tmpdct = {}
+                for service in response_dict[0]["data"]:
+                    tmpdct[service["short_id"]] = {
+                        "image": service["image"],
+                        "tag": service["tag"],
+                        "replica_running": service["replica_running"]
+                    }
+                if self.latest_data != tmpdct:
+                    logging.info("Found changes in services. Updating...")
+                    with open("UpdaterTempFile.json", "w") as tempfile:
+                        tempfile.write(json.dumps(response_dict, indent=2))
+                    self.update_file(attachment_id=self.attachment_id,
+                                     file_path="UpdaterTempFile.json")
+                    self.latest_data = tmpdct
+                    logging.info("Update complete!")
+                else:
+                    logging.info("There is no changes.")
+                logging.info("Going to sleep")
             else:
-                logging.info("There is no changes.")
-            logging.info("Going to sleep")
-            sleep(600)
+                logging.info()
+            sleep(sleep_time)
+
+    def is_worktime(self, start_time: str, end_time: str) -> bool:
+        """Decides if start_time <= now() <= end_time
+        start_time: str - HH:mm (09:00, 15:51, etc...)
+        end_time: str - HH:mm (09:00, 15:51, etc...)"""
+        now_arw = arrow.now()
+        start_time = arrow.get(start_time, "HH:mm")
+        start_time = now_arw.replace(hour=start_time.hour,
+                                     minute=start_time.minute).floor("minute")
+        end_time = arrow.get(end_time, "HH:mm")
+        end_time = now_arw.replace(hour=end_time.hour,
+                                   minute=end_time.minute).floor("minute")
+        print(start_time, end_time)
+        if start_time <= now_arw <= end_time:
+            return True
+        else:
+            return False
