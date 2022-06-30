@@ -69,7 +69,8 @@ try:
         updater_thread = threading.Thread(target=updater.worker,
                                           name="ConfluenceUploader.worker")
         updater_thread.start()
-except Exception:
+except Exception as e:
+    logging.exception(e)
     exit(1)
 
 # Инициализируем класс
