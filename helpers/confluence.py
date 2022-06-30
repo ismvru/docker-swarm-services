@@ -133,7 +133,7 @@ class ConfluenceUploader:
         """Decides if start_time <= now() <= end_time
         start_time: str - HH:mm (09:00, 15:51, etc...)
         end_time: str - HH:mm (09:00, 15:51, etc...)"""
-        now_arw = arrow.now()
+        now_arw = arrow.now(self.timezone)
         logging.debug(f"{now_arw = }")
         start_time = arrow.get(start_time, "HH:mm")
         start_time = now_arw.replace(hour=start_time.hour,
