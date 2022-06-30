@@ -63,6 +63,7 @@ except Exception:
 # запускаем обновлятор в отдельном потоке
 try:
     if run_updater:
+        logging.info("run_updater is True, starting updater")
         import threading
         updater = confluence.ConfluenceUploader()
         updater_thread = threading.Thread(target=updater.worker,
@@ -73,7 +74,7 @@ except Exception:
 
 # Инициализируем класс
 lister = serviceslister.ServicesLister()
-logging.info("Start api")
+logging.info("Init api")
 
 app = FastAPI(redoc_url=None)
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -84,6 +85,7 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/")
 async def get_list(format: str | None = None):
     """Get services list"""
+    logging.debug(f"/ - {format = }")
     if format not in ["xml", "json", "yaml", "yml", None]:
         raise HTTPException(
             400, detail=f'format must be json/xml/yaml/yml, not {format}')
@@ -92,17 +94,21 @@ async def get_list(format: str | None = None):
                                            blacklist=blacklist,
                                            timezone=timezone)
     if format in [None, "json"]:
+        logging.debug("Render JSON")
         resp = ORJSONResponse(content=service_list)
     elif format == "xml":
+        logging.debug("Render XML")
         resp = Response(content=dict2xml(service_list), media_type=mime.xml)
     elif format in ["yml", "yaml"]:
+        logging.debug("Render YAML")
         resp = Response(content=yaml.dump(service_list), media_type=mime.yaml)
     return resp
 
 
 @app.get("/ajax")
-async def get_list_for_ajax():
+async def get_list_for_ajax(request: Request):
     """Get services list for datatable"""
+    logging.debug(f"{request = }")
     return ORJSONResponse(
         lister.get_service_list(header=header,
                                 without_tasks=without_tasks,
@@ -114,4 +120,5 @@ async def get_list_for_ajax():
 @app.get("/table", response_class=HTMLResponse)
 async def render_table(request: Request):
     """Render datatable"""
+    logging.debug(f"{request = }")
     return templates.TemplateResponse("table.html", {"request": request})
