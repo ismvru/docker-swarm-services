@@ -1,6 +1,11 @@
 # Генератор списка запущенных сервисов в Docker stack в JSON
 <!-- markdownlint-disable MD013 -->
 
+[![Статус порога качества](https://sonar.ismv.ru/api/project_badges/measure?project=IsaevTech%3Apy-docker-swarm-services&metric=alert_status&token=2835dc536074b893458e40888a8fa3778726c27c)](https://sonar.ismv.ru/dashboard?id=IsaevTech%3Apy-docker-swarm-services)
+[![Ошибки](https://sonar.ismv.ru/api/project_badges/measure?project=IsaevTech%3Apy-docker-swarm-services&metric=bugs&token=2835dc536074b893458e40888a8fa3778726c27c)](https://sonar.ismv.ru/dashboard?id=IsaevTech%3Apy-docker-swarm-services)
+[![Уязвимости](https://sonar.ismv.ru/api/project_badges/measure?project=IsaevTech%3Apy-docker-swarm-services&metric=vulnerabilities&token=2835dc536074b893458e40888a8fa3778726c27c)](https://sonar.ismv.ru/dashboard?id=IsaevTech%3Apy-docker-swarm-services)
+[![Рейтинг безопасности](https://sonar.ismv.ru/api/project_badges/measure?project=IsaevTech%3Apy-docker-swarm-services&metric=security_rating&token=2835dc536074b893458e40888a8fa3778726c27c)](https://sonar.ismv.ru/dashboard?id=IsaevTech%3Apy-docker-swarm-services)
+
 - [Генератор списка запущенных сервисов в Docker stack в JSON](#генератор-списка-запущенных-сервисов-в-docker-stack-в-json)
   - [Примеры работы](#примеры-работы)
     - [Endpoint `/`](#endpoint-)
