@@ -79,12 +79,14 @@ class ConfluenceUploader:
         lister = ServicesLister()
         while True:
             logging.info("Wake up, Neo. The Matrix has you.")
+            logging.debug(f"{start_time = }, {end_time = }, {sleep_time = }")
             is_worktime = True
             if start_time is not None and end_time is not None:
                 try:
                     is_worktime = self.is_worktime(start_time, end_time)
                 except arrow.parser.ParserMatchError as e:
                     logging.exception(e)
+            logging.debug(f"{is_worktime = }")
             if is_worktime:
                 logging.info("Getting swarm services list...")
                 header = self.config["app"]["header"]
@@ -106,6 +108,8 @@ class ConfluenceUploader:
                     }
                 if self.latest_data != tmpdct:
                     logging.info("Found changes in services. Updating...")
+                    diff = dict(set(self.latest_data) ^ set(tmpdct))
+                    logging.info(f"Diff: {diff}")
                     with open("UpdaterTempFile.json", "w") as tempfile:
                         tempfile.write(json.dumps(response_dict, indent=2))
                     self.update_file(attachment_id=self.attachment_id,
@@ -116,7 +120,8 @@ class ConfluenceUploader:
                     logging.info("There is no changes.")
                 logging.info("Going to sleep")
             else:
-                logging.info()
+                logging.info(
+                    f"Nope, i'll work in interval {start_time} - {end_time}")
             sleep(sleep_time)
 
     def is_worktime(self, start_time: str, end_time: str) -> bool:
@@ -124,13 +129,15 @@ class ConfluenceUploader:
         start_time: str - HH:mm (09:00, 15:51, etc...)
         end_time: str - HH:mm (09:00, 15:51, etc...)"""
         now_arw = arrow.now()
+        logging.debug(f"{now_arw = }")
         start_time = arrow.get(start_time, "HH:mm")
         start_time = now_arw.replace(hour=start_time.hour,
                                      minute=start_time.minute).floor("minute")
+        logging.debug(f"{start_time = }")
         end_time = arrow.get(end_time, "HH:mm")
         end_time = now_arw.replace(hour=end_time.hour,
                                    minute=end_time.minute).floor("minute")
-        print(start_time, end_time)
+        logging.debug(f"{end_time = }")
         if start_time <= now_arw <= end_time:
             return True
         else:

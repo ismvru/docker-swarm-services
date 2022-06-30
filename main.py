@@ -35,7 +35,11 @@ if not exists("config.ini"):
     }
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
-logging.basicConfig(level=config["app"]["loglevel"])
+logging.basicConfig(
+    level=config["app"]["loglevel"],
+    format=  # noqa: E251
+    '%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',  # noqa: E501
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 @dataclass
