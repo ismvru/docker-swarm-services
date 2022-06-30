@@ -29,7 +29,7 @@ class ConfluenceUploader:
         if self.config["confluence"]["start_time"] == "":
             self.start_time = None
         else:
-            self.start_time = self.config["app"]["start_time"]
+            self.start_time = self.config["confluence"]["start_time"]
         if self.config["confluence"]["end_time"] == "":
             self.end_time = None
         else:
