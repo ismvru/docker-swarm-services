@@ -26,22 +26,15 @@ class ConfluenceUploader:
         self.page_id = self.config["confluence"]["page_id"]
         self.page_url = f"{self.confluence}/rest/api/content/{self.page_id}"  # noqa: E501
         self.attachment_id = self.config["confluence"]["attachment_id"]
-        try:
-            if self.config["confluence"]["start_time"] == "":
-                self.start_time = None
-            else:
-                self.start_time = self.config["app"]["start_time"]
-            if self.config["confluence"]["end_time"] == "":
-                self.end_time = None
-            else:
-                self.end_time = self.config["confluence"]["end_time"]
-        except KeyError:
+        if self.config["confluence"]["start_time"] == "":
             self.start_time = None
+        else:
+            self.start_time = self.config["app"]["start_time"]
+        if self.config["confluence"]["end_time"] == "":
             self.end_time = None
-        try:
-            self.sleep_time = self.config.getint("confluence", "sleep_time")
-        except configparser.NoOptionError:
-            self.sleep_time = 600
+        else:
+            self.end_time = self.config["confluence"]["end_time"]
+        self.sleep_time = self.config.getint("confluence", "sleep_time")
         self.headers = {
             "Accept": "application/json",
             "Authorization": f"Bearer {self.token}",
@@ -121,8 +114,6 @@ class ConfluenceUploader:
                     }
                 if self.latest_data != tmpdct:
                     logging.info("Found changes in services. Updating...")
-                    diff = dict(set(self.latest_data) ^ set(tmpdct))
-                    logging.info(f"Diff: {diff}")
                     with open("UpdaterTempFile.json", "w") as tempfile:
                         tempfile.write(json.dumps(response_dict, indent=2))
                     self.update_file(attachment_id=self.attachment_id,
