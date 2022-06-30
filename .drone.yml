@@ -42,38 +42,6 @@ steps:
       tags:
         - latest
         - ${DRONE_TAG}
-  - name: Build and push docker - FastAPI
-    image: plugins/docker
-    when:
-      event:
-        - tag
-    settings:
-      username:
-        from_secret: nexus_user
-      password:
-        from_secret: nexus_pass
-      repo: repo.ismv.ru/${DRONE_REPO_NAME}
-      registry: repo.ismv.ru
-      dockerfile: Dockerfile-fastapi
-      tags:
-        - fastapi-latest
-        - fastapi-${DRONE_TAG}
-  - name: Build and push docker - Flask
-    image: plugins/docker
-    when:
-      event:
-        - tag
-    settings:
-      username:
-        from_secret: nexus_user
-      password:
-        from_secret: nexus_pass
-      repo: repo.ismv.ru/${DRONE_REPO_NAME}
-      registry: repo.ismv.ru
-      dockerfile: Dockerfile-flask
-      tags:
-        - flask-latest
-        - flask-${DRONE_TAG}
   - name: Build and push docker - devbuilds
     image: plugins/docker
     when:
