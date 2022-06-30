@@ -11,21 +11,13 @@ from .serviceslister import ServicesLister
 class ConfluenceUploader:
 
     def __init__(self) -> None:
-        """ConfluenceUploader
-        confluence_url - Confluence server url
-        confluence_token - Confluence token
-        page_id - Confluence page ID
-        attachment_id - Confluence attachment ID"""
+        """ConfluenceUploader"""
         logging.info("Init ConfluenceUploader - start")
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
         logging.info("Configuration file loaded")
-        self.confluence = self.config["confluence"]["url"]
-        logging.info(f"Confluence address: {self.confluence}")
-        self.token = self.config["confluence"]["token"]
-        self.page_id = self.config["confluence"]["page_id"]
-        self.page_url = f"{self.confluence}/rest/api/content/{self.page_id}"  # noqa: E501
-        self.attachment_id = self.config["confluence"]["attachment_id"]
+        logging.info(f"Confluence address: {self.config['confluence']['url']}")
+        self.page_url = f"{self.config['confluence']['url']}/rest/api/content/{self.config['confluence']['page_id']}"  # noqa: E501
         try:
             if self.config["confluence"]["start_time"] == "":
                 self.start_time = None
@@ -49,13 +41,14 @@ class ConfluenceUploader:
 
         self.headers = {
             "Accept": "application/json",
-            "Authorization": f"Bearer {self.token}",
+            "Authorization": f"Bearer {self.config['confluence']['token']}",
             "X-Atlassian-Token": "no-check"
         }
         self.latest_data: dict = {}
         # Test confluence api
-        response = requests.get(f"{self.confluence}/rest/api/user/current",
-                                headers=self.headers)
+        response = requests.get(
+            f"{self.config['confluence']['url']}/rest/api/user/current",
+            headers=self.headers)
         current_user = json.loads(response.text)["username"]
         logging.info(f"{current_user = }")
         logging.info("Init ConfluenceUploader - done")
@@ -107,15 +100,12 @@ class ConfluenceUploader:
             logging.debug(f"{is_worktime = }")
             if is_worktime:
                 logging.info("Getting swarm services list...")
-                header = self.config["app"]["header"]
-                without_tasks = self.config.getboolean("app", "without_tasks")
-                blacklist = self.config["app"]["blacklist"]
-                timezone = self.config["app"]["timezone"]
                 response_dict = lister.get_service_list(
-                    header=header,
-                    without_tasks=without_tasks,
-                    blacklist=blacklist,
-                    timezone=timezone)
+                    header=self.config["app"]["header"],
+                    without_tasks=self.config.getboolean(
+                        "app", "without_tasks"),
+                    blacklist=self.config["app"]["blacklist"],
+                    timezone=self.config["app"]["timezone"])
                 logging.info("Searching for changes")
                 tmpdct = {}
                 for service in response_dict[0]["data"]:
@@ -128,7 +118,8 @@ class ConfluenceUploader:
                     logging.info("Found changes in services. Updating...")
                     with open("UpdaterTempFile.json", "w") as tempfile:
                         tempfile.write(json.dumps(response_dict, indent=2))
-                    self.update_file(attachment_id=self.attachment_id,
+                    self.update_file(attachment_id=self.config["confluence"]
+                                     ["attachment_id"],
                                      file_path="UpdaterTempFile.json")
                     self.latest_data = tmpdct
                     logging.info("Update complete!")
@@ -145,7 +136,7 @@ class ConfluenceUploader:
         """Decides if start_time <= now() <= end_time
         start_time: str - HH:mm (09:00, 15:51, etc...)
         end_time: str - HH:mm (09:00, 15:51, etc...)"""
-        now_arw = arrow.now(self.timezone)
+        now_arw = arrow.now(self.config["app"]["timezone"])
         logging.debug(f"{now_arw = }")
         start_time = arrow.get(start_time, "HH:mm")
         start_time = now_arw.replace(hour=start_time.hour,

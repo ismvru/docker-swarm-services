@@ -50,10 +50,6 @@ class mime:
     yaml: str = "text/yaml"
 
 
-header = config["app"]["header"]
-without_tasks = config.getboolean("app", "without_tasks")
-blacklist = config["app"]["blacklist"]
-timezone = config["app"]["timezone"]
 try:
     run_updater = config.getboolean("confluence", "run_updater")
 except Exception:
@@ -90,10 +86,11 @@ async def get_list(format: str | None = None):
     if format not in ["xml", "json", "yaml", "yml", None]:
         raise HTTPException(
             400, detail=f'format must be json/xml/yaml/yml, not {format}')
-    service_list = lister.get_service_list(header=header,
-                                           without_tasks=without_tasks,
-                                           blacklist=blacklist,
-                                           timezone=timezone)
+    service_list = lister.get_service_list(
+        header=config["app"]["header"],
+        without_tasks=config.getboolean("app", "without_tasks"),
+        blacklist=config["app"]["blacklist"],
+        timezone=config["app"]["timezone"])
     if format in [None, "json"]:
         logging.debug("Render JSON")
         resp = ORJSONResponse(content=service_list)
@@ -111,10 +108,11 @@ async def get_list_for_ajax(request: Request):
     """Get services list for datatable"""
     logging.debug(f"{request = }")
     return ORJSONResponse(
-        lister.get_service_list(header=header,
-                                without_tasks=without_tasks,
-                                blacklist=blacklist,
-                                timezone=timezone,
+        lister.get_service_list(header=config["app"]["header"],
+                                without_tasks=config.getboolean(
+                                    "app", "without_tasks"),
+                                blacklist=config["app"]["blacklist"],
+                                timezone=config["app"]["timezone"],
                                 ajax=True))
 
 
